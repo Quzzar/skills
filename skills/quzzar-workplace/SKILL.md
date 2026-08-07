@@ -100,7 +100,7 @@ The distinction matters and isn't optional:
 # The stack
 
 These are our main solutions to problems — the core tools we should be building with. Reach
-for something outside this table only with a reason, and see [Dependencies](#dependencies).
+for something outside this table only with a reason.
 
 ## Frontend — the base of every web app
 
@@ -159,22 +159,6 @@ for something outside this table only with a reason, and see [Dependencies](#dep
 
 # Process
 
-Sections below marked `<!-- TODO -->` have no convention recorded yet.
-
-**When you hit one: do not invent a rule.** Follow what the surrounding code or history already
-does, and say plainly which convention was missing. If existing practice is inconsistent and
-the choice matters, use `AskUserQuestion` (see core guideline 3).
-
-An invented convention is worse than no convention — it gets applied confidently, spreads, and
-looks deliberate.
-
-## Issue tracking
-
-<!-- TODO: Which tracker, and how you actually use it.
-     - Where does work originate — issue first, or code first?
-     - Required fields/labels on a new issue. Triage labels.
-     - Does a branch or PR need to reference an issue? How? -->
-
 ## Environments and promotion
 
 Three branches, promoted in order:
@@ -190,43 +174,6 @@ This is what makes core guideline 1 safe: deleting an unused system isn't risky,
 deletion travels the same path as any other change and gets exercised at each stop before it
 reaches `main`.
 
-<!-- TODO: What gates each promotion — automatic on merge, or manual?
-     - Which environment each branch deploys to.
-     - Hotfix path when something needs to reach main without waiting. -->
-
-## Branches
-
-Work branches off `dev` and merges back into it.
-
-<!-- TODO: Naming pattern for work branches.
-     - Rebase or merge to stay current with dev?
-     - Deleted on merge? -->
-
-## Commits
-
-<!-- TODO: Conventional commits, or prose? Subject length and mood.
-     When does a body get written? Squash before pushing, or keep history? -->
-
-## Pull requests
-
-<!-- TODO: What a PR must contain before review. Description structure.
-     Screenshots for UI changes? Max size before it must be split?
-     Who reviews, how many approvals, can you self-merge? -->
-
-## CI and merging
-
-<!-- TODO: What must be green before merge, and what's advisory.
-     Merge strategy. How releases and deploys are triggered. -->
-
-## Testing
-
-Playwright, end-to-end against a running app.
-
-<!-- TODO: Where Playwright specs live and how they're named.
-     - What must have a spec before merge, and what needn't.
-     - Which environment specs run against in CI — and whether they gate promotion.
-     - Whether anything is unit-tested below the e2e layer, or Playwright is the whole story. -->
-
 ---
 
 # Repo-wide code rules
@@ -236,50 +183,80 @@ Types, schemas, documentation, and the API response shape are covered in
 
 ## Naming
 
-<!-- TODO: Casing for files, directories, exports, types, constants, booleans.
-     Abbreviations: allowed or spelled out?
-     Domain terms with a fixed spelling — glossary here or linked. -->
+| Thing | Casing | Example |
+| --- | --- | --- |
+| Component file | `PascalCase.tsx` | `SettingsPanel.tsx`, `UserAvatar.tsx` |
+| Non-component module | lowercase — one word, or `kebab-case` | `format.ts`, `theme.ts`, `asset-layer.ts`, `user-manager.ts` |
+| Directory | lowercase — one word, or `kebab-case` | `atoms`, `routes`, `site-view`, `vector-db` |
+| Type / interface | `PascalCase` | `LoadState`, `FieldSpec` |
+| Value / function | `camelCase` | `resolveSite`, `queryClient` |
+| True constant | `SCREAMING_SNAKE_CASE` | `HEADER_H`, `PROJECT_SECTIONS`, `SUPABASE_URL` |
+| Jotai atom | `camelCase` + `Atom` suffix | `themeAtom`, `selectionAtom` |
+| Boolean | `is` / `has` / `can` / `should` prefix | `isLoading`, `hasOutput`, `canDrag`, `shouldCreateUser` |
+
+Prefer `type` over `interface` — that's the dominant choice in practice, and `type` covers
+unions, which the result types in [Error handling](#error-handling) need.
+
+Spell words out. `resolveSite`, not `resSite`. The exceptions are terms already standard in the
+domain or the platform (`url`, `id`, `db`, `otp`, `ui`).
+
+**camelCase filenames are wrong, including where you find them.** Existing code has some —
+`resolveSite.ts`, `siteModels.ts` sitting next to `asset-layer.ts` in the same directory. That's
+drift, not a second convention. Write `resolve-site.ts`.
+
+This is the one place where "match the surrounding code" does **not** apply. A wrong neighbour
+is not a precedent — matching it is how the drift spread in the first place. Directories are
+`kebab-case` for the same reason; `snake_case` directories in older code are drift too.
 
 ## File organization
 
-<!-- TODO: How a feature's files are grouped — by layer or by feature?
-     Where shared code lives, and the bar for promoting into it.
-     Barrel files: used or banned? -->
+**Top level of `src/` is by layer.** One lowercase directory per concern:
+
+```
+src/
+  atoms/       client state
+  auth/        session and route guards
+  components/  shared UI
+  data/        server state — queries and mutations
+  lib/         configured clients and adapters
+  routes/      pages
+  utils/       pure helpers
+```
+
+**Feature grouping happens inside a layer, not above it.** A feature that grows past a couple of
+files gets a subdirectory in the layer it belongs to — `components/site-view/`, not a top-level
+`site-view/` holding its own atoms, queries, and components.
+
+Shared UI packages organize by component instead: one lowercase directory per component
+(`button/`, `accordion/`, `input-cards/`), with named exports barrelled through `src/index.ts`.
+
+A file earns promotion into a shared package when a second surface needs it — not when you
+anticipate one might.
 
 ## Comments
 
-JSDoc-style documentation, per core guideline 4.
-
-<!-- TODO: Beyond JSDoc — is it required on every public export, or only non-obvious ones?
-     Stance on inline comments (why, not what?).
-     TODO comment format, and whether they need a linked issue. -->
+JSDoc and comment blocks. Documented code is core guideline 4 — this is the form it takes.
 
 ## Error handling
 
-<!-- TODO: Throw vs. return a result type, and where each applies.
-     Custom error classes — do they exist, where do they live?
-     What must never be swallowed. Rules for `console.*` vs. a real logger.
-     Note: the client-facing shape is already fixed by core guideline 5. -->
+**Return a result type.** A function that can fail says so in its return type, so the caller
+has to deal with it — the same discriminated-union shape as `ApiResponse` in core guideline 5,
+scaled down to whatever the function needs.
 
-## Dependencies
+`throw` is a last resort, not the default. It's invisible in the signature and turns every
+caller into a maybe-handler. Reach for it only where there's genuinely nothing to return to.
 
-[The stack](#the-stack) is the dependency policy. Prefer a tool already in that table over a
-new package, and prefer the standard library or a small local utility over a dependency that
-earns its place only once.
-
-<!-- TODO: The bar for adding something NOT in the table — who approves, and what justifies it.
-     Anything explicitly banned beyond `npm` and a second datastore/auth vendor.
-     Pinned exact or ranged? Who handles upgrades? -->
+**Log.** Logging is wanted, not tolerated — a failure that's handled quietly still gets
+recorded. Swallowing an error without a log is the thing to avoid.
 
 ## Formatting and lint
 
-<!-- TODO: The tool of record, and whether its output is final.
-     Rules deliberately disabled, and why. Is a lint warning acceptable to merge? -->
+**ESLint** for linting, **Prettier** for formatting. Their output is the answer — don't
+hand-format around them, and don't argue with a rule in review when it can be configured
+instead.
 
-## Testing
-
-See [Testing](#testing) under Process. Layer-specific rules live in `quzzar-frontend` and
-`quzzar-backend`.
+Run `eslint-config-prettier` so ESLint stops enforcing the stylistic rules Prettier owns.
+Without it the two fight over the same lines and every save flips the file back and forth.
 
 ---
 
@@ -290,4 +267,6 @@ See [Testing](#testing) under Process. Layer-specific rules live in `quzzar-fron
 - `CLAUDE.md` overrides this file. This skill holds durable preferences that travel between
   repos; `CLAUDE.md` holds the facts of the repo in front of you.
 - Where this file is silent, the surrounding code is the convention. Match it and say so.
+- Where this file is **not** silent, it beats the surrounding code. Existing code that breaks a
+  rule recorded here is drift to be corrected, not a local convention to be matched.
 - Never report a convention as established when it came from a `<!-- TODO -->` section.
