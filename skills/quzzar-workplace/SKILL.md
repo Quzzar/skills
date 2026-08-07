@@ -1,6 +1,6 @@
 ---
 name: quzzar-workplace
-description: Quzzar's core engineering guidelines and canonical tool stack, covering dead-code deletion, consolidation, when to ask for alignment, strict TypeScript and Zod, the standard API response shape, plus naming, file organization, error handling, comments, and formatting. Read before starting any work in a quzzar repo.
+description: Quzzar's core engineering guidelines and canonical tool stack, covering dead-code deletion, consolidation, when to ask for alignment, strict TypeScript and Zod, the standard API response shape, the top-level docs/ knowledge tree, plus naming, file organization, error handling, comments, and formatting. Read before starting any work in a quzzar repo.
 ---
 
 # quzzar-workplace
@@ -176,6 +176,57 @@ reaches `main`.
 
 ---
 
+# Project docs
+
+**A top-level `docs/` directory holds the project's knowledge, one markdown file per topic.**
+It's the repo's brain: what a new engineer, or a fresh agent session, would otherwise have to
+ask a person for.
+
+## What belongs there
+
+The test is whether the answer is recoverable from the code. If it can be found by reading the
+source, it doesn't need a doc. If it lives only in someone's head, a Slack thread, or a
+vendor's dashboard, it belongs in `docs/`.
+
+In practice that's things like how a pipeline runs end to end, why an integration is shaped the
+way it is, what the environments are and who can reach them, the business rules behind a
+feature, and what to do when a given system fails in production.
+
+There's no fixed topic list, and don't scaffold one. Repos differ, and a canonical set would
+sit half-empty in most of them. Add a file when there's something to write.
+
+## Shape
+
+- One topic per file, `kebab-case.md`, flat at the top of `docs/`.
+- A topic that outgrows one file gets a subdirectory. Same rule as features inside a layer:
+  grouping happens when the volume earns it, not in anticipation.
+- `docs/README.md` is the index. One line per topic, saying what it covers. That's how an
+  agent finds the right file without opening all of them.
+
+Two paths under `docs/` are reserved, and are not topic files:
+
+| Path | Holds | Written by |
+| --- | --- | --- |
+| `docs/adr/` | Architecture decision records, numbered | Matt's `domain-modeling` skill |
+| `docs/agents/` | Agent config: issue tracker, domain layout, triage labels | `/setup-matt-pocock-skills` |
+
+`CONTEXT.md` at the repo root is the domain glossary, owned by that same `domain-modeling`
+skill. Terminology goes there, not into a `docs/` topic file.
+
+## Read it, and keep it current
+
+**Before working in an area, read the `docs/` topic covering it.** Start at `docs/README.md`.
+This is the `CLAUDE.md` habit one level down: `CLAUDE.md` carries the repo's facts in every
+session, `docs/` carries the depth you pull in when the work touches it.
+
+**When a change moves what a doc describes, update that doc in the same change.** Not a
+follow-up, not a ticket. The doc ships with the code or it's already wrong.
+
+A stale doc is worse than a missing one, because it gets believed. When a topic stops existing,
+delete its file. Core guideline 1 covers documentation too.
+
+---
+
 # Repo-wide code rules
 
 Types, schemas, documentation, and the API response shape are covered in
@@ -287,6 +338,8 @@ Without it the two fight over the same lines and every save flips the file back 
   being asked.
 - `CLAUDE.md` overrides this file. This skill holds durable preferences that travel between
   repos; `CLAUDE.md` holds the facts of the repo in front of you.
+- Read the `docs/` topic before working in its area, and update it in the same change. A stale
+  doc gets believed.
 - Where this file is silent, the surrounding code is the convention. Match it and say so.
 - Where this file is **not** silent, it beats the surrounding code. Existing code that breaks a
   rule recorded here is drift to be corrected, not a local convention to be matched.
