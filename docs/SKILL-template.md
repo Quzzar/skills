@@ -1,11 +1,11 @@
 # SKILL.md template
 
-Copy this into `skills/<your-skill-name>/SKILL.md`. Kept in `docs/` on purpose — the
+Copy this into `skills/<your-skill-name>/SKILL.md`. Kept in `docs/` on purpose, because the
 `skills` CLI only discovers directories that contain a `SKILL.md`, so a template living
 here never shows up as an installable skill.
 
 After adding a skill, add its path to the `skills` array in
-[`.claude-plugin/plugin.json`](../.claude-plugin/plugin.json) — that file is only read by
+[`.claude-plugin/plugin.json`](../.claude-plugin/plugin.json). That file is only read by
 the Claude Code plugin installer, and it does **not** auto-discover.
 
 ---
@@ -51,15 +51,15 @@ Optional: `metadata.internal: true` hides a skill from discovery unless
 
 ## Writing a description that triggers correctly
 
-The `description` is the entire basis for the model deciding whether to load the skill —
+The `description` is the entire basis for the model deciding whether to load the skill,
 the body is not read until then. So it needs both halves:
 
-1. **What it does** — so the model knows if it's relevant.
-2. **When to use it** — literal phrases the user is likely to type.
+1. **What it does**, so the model knows if it's relevant.
+2. **When to use it**: literal phrases the user is likely to type.
 
 Compare:
 
-- ✗ `description: Helps with pull requests` — too vague to match against, will misfire.
+- ✗ `description: Helps with pull requests`. Too vague to match against, will misfire.
 - ✓ `description: Draft a pull request description from the actual branch diff. Use when the user asks to "write a PR description", "open a PR", or "describe these changes".`
 
 Naming the negative case (`Do not use for...`) in the body is what stops a skill firing on
@@ -68,5 +68,5 @@ every adjacent request.
 ## Body
 
 Plain markdown, written as instructions to an agent rather than documentation for a human.
-Imperative, specific, and short — anything the model already knows is noise. Reference
+Imperative, specific, and short. Anything the model already knows is noise. Reference
 extra files relatively (`./reference.md`) and they travel with the skill on install.

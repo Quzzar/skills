@@ -1,17 +1,17 @@
 ---
 name: quzzar-backend
-description: Quzzar's backend conventions — the two runtimes, the single write path, enforcing invariants in Postgres, shared schemas across runtimes, orchestration, secrets, and observability. Use before writing or changing any server-side code, API route, database query, migration, or edge function.
+description: Quzzar's backend conventions covering the two runtimes, the single write path, enforcing invariants in Postgres, shared schemas across runtimes, orchestration, secrets, and observability. Use before writing or changing any server-side code, API route, database query, migration, or edge function.
 ---
 
 # quzzar-backend
 
 Backend conventions. Repo-wide rules (naming, file organization, error handling, formatting) live
-in `quzzar-workplace` — read that too.
+in `quzzar-workplace`. Read that too.
 
 ## When to use
 
 - Writing or changing an API route, handler, edge function, or service function.
-- Touching the database — queries, schema, RLS policies, or migrations.
+- Touching the database: queries, schema, RLS policies, or migrations.
 - Adding auth, validation, a workflow, or an external integration.
 - Anything involving secrets or deploy configuration.
 
@@ -23,7 +23,7 @@ facts beat anything general below. If it has no `<!-- quzzar-skills:start -->` b
 
 ## Tool choices are already decided
 
-**Which** tool to use is fixed by the stack table in `quzzar-workplace` — bun, Temporal, Deno,
+**Which** tool to use is fixed by the stack table in `quzzar-workplace`: bun, Temporal, Deno,
 Supabase, GitHub Actions, Langfuse, Zod, Playwright.
 
 The list is closed. A second datastore or auth vendor is explicitly out; anything else outside
@@ -31,18 +31,18 @@ the table is an `AskUserQuestion`, not a judgment call.
 
 ---
 
-## Two runtimes — don't mix them up
+## Two runtimes, and don't mix them up
 
-- **bun** — runtime *and* package manager for service packages and the workspace root.
+- **bun**: runtime *and* package manager for service packages and the workspace root.
   **Never npm.**
-- **Deno** — the edge-function runtime. **Not bun.**
+- **Deno**: the edge-function runtime. **Not bun.**
 
 Check which context you're in before writing a runtime-specific import or a lockfile-touching
 command. Code written for one does not necessarily run on the other.
 
 ## Shared schemas across runtimes
 
-Every cross-boundary shape is a Zod schema in the shared schema package — wire shapes, intake,
+Every cross-boundary shape is a Zod schema in the shared schema package: wire shapes, intake,
 agent contracts, and form validation via the RHF resolver. **One schema, validated on both ends.**
 
 Objects are **parsed** at the boundary, not cast (core guideline 4). Types are derived from
@@ -50,7 +50,7 @@ schemas rather than declared alongside them.
 
 Two things bite when one package is consumed as source by both runtimes:
 
-- **Relative imports need explicit `.ts` extensions** — Deno rejects extensionless imports, and
+- **Relative imports need explicit `.ts` extensions**. Deno rejects extensionless imports, and
   every tsc consumer then needs `allowImportingTsExtensions`. Type-check against *both* runtimes
   after touching the shared package, not just the one you're working in.
 - **If a bundler can't reach outside its workdir**, the schemas get copied in-tree instead.
@@ -70,13 +70,13 @@ place. Don't add a write policy to work around a hard-to-reach endpoint; that qu
 the surface the design closes.
 
 Use SECURITY DEFINER helper functions to break membership-table self-recursion in policies, and
-keep visibility resolution in a single function that the SELECT policy calls — one place to
+keep visibility resolution in a single function that the SELECT policy calls. That's one place to
 reason about who can see what.
 
 ## Enforce invariants in Postgres
 
-Limits, capacity, and uniqueness belong in the database — BEFORE triggers with advisory locks,
-partial unique indexes — not only in application code. Application checks race; the database
+Limits, capacity, and uniqueness belong in the database (BEFORE triggers with advisory locks,
+partial unique indexes), not only in application code. Application checks race; the database
 doesn't.
 
 The API layer's job is to *map* a database rejection onto a good response (core guideline 5:
@@ -90,14 +90,14 @@ where "it looks right" is worth least.
 
 Migrations are reviewed like code, and must be safe to deploy *before* the code that uses them.
 
-Destructive changes are staged rather than dropped in one step — core guideline 1 wants dead
+Destructive changes are staged rather than dropped in one step. Core guideline 1 wants dead
 columns gone, and the promotion path in `quzzar-workplace` (`dev → staging → main`) is what makes
 that safe: the removal gets exercised at each stop before it reaches `main`.
 
 ## Orchestration
 
 Durable orchestration for long-running pipelines. **One task queue per pipeline, each with its
-own worker entry point** — deliberately separate so a local `pkill` can't cross-kill the other
+own worker entry point**, deliberately separate so a local `pkill` can't cross-kill the other
 workers.
 
 Keep that separation when adding workers; a shared entry point reintroduces the exact problem
@@ -106,8 +106,8 @@ it exists to prevent.
 ## API design
 
 Every response follows the `ApiResponse<T, F>` shape from `quzzar-workplace` core guideline 5.
-The three-way split is load-bearing: `success`, `fail` (client's fault — validation and business
-rules, per-field in `data`), `error` (server's fault — `message` safe to surface, never leaking
+The three-way split is load-bearing: `success`, `fail` (client's fault: validation and business
+rules, per-field in `data`), `error` (server's fault: `message` safe to surface, never leaking
 internals).
 
 ## Config and secrets
@@ -117,17 +117,17 @@ internals).
 - **Rotate anything that gets pasted into a chat, ticket, or PR.** Treat exposure as having
   happened, not as a risk to assess.
 - Each runtime and each host reads secrets differently. When adding one, account for every place
-  it has to exist — local, CI, and the deploy target — or it will fail in exactly the one you
+  it has to exist (local, CI, and the deploy target), or it will fail in exactly the one you
   forgot.
 
 ## Deploy
 
-Verify deploy configuration explicitly rather than trusting defaults — a per-function auth
+Verify deploy configuration explicitly rather than trusting defaults. A per-function auth
 setting that defaults the wrong way will silently gateway-lock a function on its *next* deploy,
 long after the change that caused it.
 
 **Smoke-test after deploying.** An unauthenticated request should return your handler's own
-response, not the platform's — that distinction is what tells you the function is actually
+response, not the platform's. That distinction is what tells you the function is actually
 reachable.
 
 ## Observability
@@ -135,15 +135,15 @@ reachable.
 Langfuse for tracing and quality scores on pipeline runs.
 
 Never put PII, tokens, or full request payloads in a trace or a log. Logging is wanted
-(`quzzar-workplace` error handling) — logging secrets is not.
+(`quzzar-workplace` error handling). Logging secrets is not.
 
 ## Testing
 
 Playwright, end-to-end against a running app, per `quzzar-workplace`.
 
 Note the gap: an e2e-first tool only reaches backend surface exposed through a request path.
-Workflows, activities, and permission policies that no request touches need their own coverage —
-the access test above is part of that answer.
+Workflows, activities, and permission policies that no request touches need their own coverage.
+The access test above is part of that answer.
 
 ---
 
@@ -156,6 +156,6 @@ the access test above is part of that answer.
 - Every cross-boundary shape is a Zod schema, parsed at the boundary, shared by both ends.
 - Every response is `ApiResponse<T, F>`. `fail` is the client's fault, `error` is ours.
 - Rotate any secret that gets pasted anywhere.
-- `CLAUDE.md` overrides this file — it holds the facts of the repo in front of you.
+- `CLAUDE.md` overrides this file. It holds the facts of the repo in front of you.
 - Deleting an unused endpoint means deleting its schema, tests, types, and policies too
   (core guideline 1).

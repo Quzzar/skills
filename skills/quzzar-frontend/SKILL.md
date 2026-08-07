@@ -1,12 +1,12 @@
 ---
 name: quzzar-frontend
-description: Quzzar's frontend conventions — the layer boundary between shared UI and app code, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, and the component gallery. Use before writing or changing any UI code, React components, styles, or client-side state.
+description: Quzzar's frontend conventions covering the layer boundary between shared UI and app code, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, and the component gallery. Use before writing or changing any UI code, React components, styles, or client-side state.
 ---
 
 # quzzar-frontend
 
 Frontend conventions. Repo-wide rules (naming, file organization, error handling, formatting)
-live in `quzzar-workplace` — read that too.
+live in `quzzar-workplace`. Read that too.
 
 ## When to use
 
@@ -23,12 +23,12 @@ commands. Repo facts beat anything general below. If it has no
 
 ## Tool choices are already decided
 
-**Which** tool to use is fixed by the stack table in `quzzar-workplace` — React + Vite +
+**Which** tool to use is fixed by the stack table in `quzzar-workplace`: React + Vite +
 TypeScript, React Router, vanilla-extract, Jotai, React Query, nuqs, TanStack Table, React Hook
 Form, Radix, Motion, Playwright, and the rest, each with its stated role and layer.
 
 **The list is closed.** It's a standard, so a new library is the exception, not a judgment call.
-When a frontend need comes up — dates, a table, a toast, a command palette, URL state — the
+When a frontend need comes up (dates, a table, a toast, a command palette, URL state), the
 answer is almost always already on the list. If a genuine gap appears, decide the layer first
 (does it belong inside the shared UI package, or app-level?), then raise it with
 `AskUserQuestion`.
@@ -52,7 +52,7 @@ Jotai, React Router, nuqs, and anything 3D cannot.
 - One component per file, `PascalCase.tsx` (see `quzzar-workplace` for naming).
 - **Named exports**, barrelled through the package's `src/index.ts`.
 - Each interactive component wraps a primitive from the accessible-primitives library and is
-  skinned with token CSS — that's what keeps behaviour correct and appearance ours.
+  skinned with token CSS. That's what keeps behaviour correct and appearance ours.
 - A file earns promotion into the shared package when a second surface needs it, not when you
   anticipate one might.
 
@@ -71,7 +71,7 @@ a settled home:
 | focus trap, click-outside, roving tabindex | Radix primitives |
 | slider drag, radial move | Radix Slider or Motion |
 
-A shared hooks library is for what's left over — genuinely generic utilities. Keep its rationale
+A shared hooks library is for what's left over: genuinely generic utilities. Keep its rationale
 at the top of its barrel file so nobody re-implements something the stack already provides.
 
 Prefer vendoring a small utility (with attribution) over taking a dependency, when it keeps the
@@ -79,7 +79,7 @@ shared package light.
 
 ## Styling
 
-vanilla-extract — zero-runtime CSS-in-TypeScript, compiled to static CSS at build time via the
+vanilla-extract: zero-runtime CSS-in-TypeScript, compiled to static CSS at build time via the
 Vite integration. Class names, variables, and theme contracts are type-checked.
 
 This is core guideline 4 applied to CSS: the compiler catches a bad token reference instead of it
@@ -87,7 +87,7 @@ silently rendering nothing.
 
 ## Design tokens
 
-**Tokens are the source of truth.** A raw hex or px value in a component is a bug — it's a value
+**Tokens are the source of truth.** A raw hex or px value in a component is a bug. It's a value
 that can't be themed and won't move when the system does.
 
 Motion has tokens too (duration, easing). Use them rather than hardcoding timings, so animation
@@ -95,11 +95,11 @@ stays consistent across components and respects a single point of change.
 
 ## Animation
 
-- **Motion is the default** — component enter/exit, layout animations, gestures, parallax.
+- **Motion is the default**: component enter/exit, layout animations, gestures, parallax.
 - **GSAP is narrow**: SVG plugins (DrawSVG, MorphSVG, MotionPath) and heavy scroll-scrubbed
   timelines. Not for ordinary component animation.
 - **Overlays are the exception.** Let the primitive library's `data-state` CSS drive overlay
-  enter/exit on the motion tokens. Motion exit through a portal is unreliable — Motion is for
+  enter/exit on the motion tokens. Motion exit through a portal is unreliable. Motion is for
   layout and gesture polish, not overlay teardown.
 - Respect reduced-motion.
 
@@ -114,16 +114,16 @@ reached for a primitive instead.
 
 ## State
 
-Three stores, three jobs — pick by where the state belongs:
+Three stores, three jobs. Pick by where the state belongs:
 
-- **Jotai** — global/client state, atomically. Also the storage layer, via `atomWithStorage`.
-- **nuqs** — URL / query-string state. Filters, tabs, and pagination belong in the URL.
-- **React Query** — server state and data fetching, in the app's data layer.
+- **Jotai**: global/client state, atomically. Also the storage layer, via `atomWithStorage`.
+- **nuqs**: URL / query-string state. Filters, tabs, and pagination belong in the URL.
+- **React Query**: server state and data fetching, in the app's data layer.
 
 ## Data fetching
 
 React Query, in the app's data layer. Responses are **parsed through their Zod schema on fetch**
-(core guideline 4) — never cast, never trusted. Schemas come from the shared schema package.
+(core guideline 4). Never cast, never trusted. Schemas come from the shared schema package.
 
 Expect the `ApiResponse` shape from `quzzar-workplace` core guideline 5, and handle `fail`
 (client's fault, per-field) separately from `error` (server's fault).
@@ -131,15 +131,15 @@ Expect the `ApiResponse` shape from `quzzar-workplace` core guideline 5, and han
 ## Forms
 
 React Hook Form, with the resolver bridging to the Zod schema. **One schema, validated on both
-ends** — the form and the server share it, from the shared schema package.
+ends**. The form and the server share it, from the shared schema package.
 
-## UI copy — terse, never verbose
+## UI copy: terse, never verbose
 
 A standing rule, and it holds everywhere:
 
 - A surface gets a short title and **at most one** short supporting line. Aim well under ten
   words.
-- Consequences and caveats live in the confirm dialog that gates the action — never as prose
+- Consequences and caveats live in the confirm dialog that gates the action, never as prose
   above the controls. **Don't narrate; gate.**
 - If copy needs multiple sentences to justify an element, the element is wrong.
 
@@ -149,7 +149,7 @@ not by default.
 
 ## The component gallery
 
-A standalone internal app renders every shared component with mock props — it's the fidelity
+A standalone internal app renders every shared component with mock props. It's the fidelity
 check, and it stands in for Storybook.
 
 **When you add or change a shared component, add or update its gallery page.** Cover the real
@@ -169,6 +169,6 @@ Playwright, end-to-end against a running app, per `quzzar-workplace`.
 - Fetched data is parsed through its Zod schema. No casting into shape.
 - Tokens, not raw values.
 - Short copy. Don't narrate; gate.
-- `CLAUDE.md` overrides this file — it holds the facts of the repo in front of you.
+- `CLAUDE.md` overrides this file. It holds the facts of the repo in front of you.
 - Deleting an unused component means deleting its styles, gallery page, tests, and exports too
   (core guideline 1).
