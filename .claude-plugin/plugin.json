@@ -1,0 +1,21 @@
+{
+  "name": "quzzar-skills",
+  "version": "0.1.0",
+  "description": "Quzzar's agent skills.",
+  "author": {
+    "name": "Quzzar",
+    "url": "https://github.com/Quzzar"
+  },
+  "repository": "https://github.com/Quzzar/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "engineering"
+  ],
+  "skills": [
+    "./skills/setup",
+    "./skills/quzzar-workplace",
+    "./skills/quzzar-frontend",
+    "./skills/quzzar-backend"
+  ]
+}

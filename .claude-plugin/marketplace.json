@@ -1,0 +1,20 @@
+{
+  "name": "quzzar",
+  "owner": {
+    "name": "Quzzar",
+    "url": "https://github.com/Quzzar"
+  },
+  "description": "Quzzar's skills, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "quzzar-skills",
+      "source": "./",
+      "description": "Quzzar's agent skills.",
+      "category": "engineering",
+      "keywords": [
+        "skills",
+        "engineering"
+      ]
+    }
+  ]
+}
