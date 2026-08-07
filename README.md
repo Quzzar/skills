@@ -87,7 +87,7 @@ project skill, not here.
 ## Adding a skill
 
 1. `mkdir -p skills/<name>` and write `SKILL.md`. See
-   [`docs/SKILL-template.md`](docs/SKILL-template.md) for the frontmatter and how to write a
+   [`docs/skill-template.md`](docs/skill-template.md) for the frontmatter and how to write a
    `description` that triggers reliably. It's the only part loaded into context until the skill
    fires, so a vague one misfires.
 2. Add `./skills/<name>` to the `skills` array in

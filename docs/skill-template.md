@@ -2,7 +2,9 @@
 
 Copy this into `skills/<your-skill-name>/SKILL.md`. Kept in `docs/` on purpose, because the
 `skills` CLI only discovers directories that contain a `SKILL.md`, so a template living
-here never shows up as an installable skill.
+here never shows up as an installable skill. That's also why this file is
+`skill-template.md` rather than `SKILL-template.md`: close enough to the discovered name is
+not worth the risk, and `kebab-case.md` is the convention for a `docs/` topic anyway.
 
 After adding a skill, add its path to the `skills` array in
 [`.claude-plugin/plugin.json`](../.claude-plugin/plugin.json). That file is only read by
