@@ -1,19 +1,19 @@
 ---
 name: quzzar-frontend
-description: Quzzar's frontend conventions — component structure, styling, state management, data fetching, forms, routing, accessibility, performance, and UI testing. Use before writing or changing any UI code, React components, styles, client-side state, or frontend tests.
+description: Quzzar's frontend conventions — the layer boundary between shared UI and app code, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, and the component gallery. Use before writing or changing any UI code, React components, styles, or client-side state.
 ---
 
 # quzzar-frontend
 
-Frontend conventions. Repo-wide rules (naming, commits, dependencies, file organization)
-live in `quzzar-workplace` — read that too for anything not specific to the UI layer.
+Frontend conventions. Repo-wide rules (naming, file organization, error handling, formatting)
+live in `quzzar-workplace` — read that too.
 
 ## When to use
 
 - Writing or changing a component, page, layout, or route.
 - Touching styles, design tokens, or theme.
 - Adding client state, a data fetch, or a form.
-- Writing or fixing a frontend test.
+- Writing UI copy.
 
 ## First: read the repo's own context
 
@@ -25,195 +25,150 @@ commands. Repo facts beat anything general below. If it has no
 
 **Which** tool to use is fixed by the stack table in `quzzar-workplace` — React + Vite +
 TypeScript, React Router, vanilla-extract, Jotai, React Query, nuqs, TanStack Table, React Hook
-Form, Radix, Motion, Playwright, and the rest, each with its stated role and layer. Read it and
-use what it says.
+Form, Radix, Motion, Playwright, and the rest, each with its stated role and layer.
 
-This skill covers **how** we use them. Don't re-litigate the tool; if you think something
-outside the table is needed, that's an `AskUserQuestion`, not a judgment call.
-
-## Handling unfilled sections
-
-Sections marked `<!-- TODO -->` have no convention recorded yet.
-
-**Do not invent one.** Match the nearest existing component, and name the missing convention
-in your report. If existing components disagree and the choice matters, use `AskUserQuestion`.
+**The list is closed.** It's a standard, so a new library is the exception, not a judgment call.
+When a frontend need comes up — dates, a table, a toast, a command palette, URL state — the
+answer is almost always already on the list. If a genuine gap appears, decide the layer first
+(does it belong inside the shared UI package, or app-level?), then raise it with
+`AskUserQuestion`.
 
 ---
 
-## Routing
+## The layer boundary
 
-React Router (`react-router-dom`), host-aware — marketing and portal are distinct hosts.
+The one rule that shapes everything else: **presentation libraries may live inside the shared UI
+package; data, state, and routing libraries stay app-level and never become its dependencies.**
 
-<!-- TODO: Route file layout, and how the marketing/portal host split is expressed in code.
-     - Where route definitions live, and whether they're colocated with features.
-     - Loading and error boundary conventions per route.
-     - Route-level code splitting: default, or on evidence? -->
+Coupling a design system to the data layer is the thing to avoid. A marketing site or a
+component gallery must be able to consume the UI package without dragging in a query client, a
+router, or database types.
+
+So: Radix, Motion, and the icon set can be dependencies of the shared package. React Query,
+Jotai, React Router, nuqs, and anything 3D cannot.
 
 ## Component structure
 
-<!-- TODO: One component per file, or colocated helpers?
-     - Default export or named? Function declaration or arrow const?
-     - Props: inline type or a named `Props` type? Destructured in the signature?
-     - When a component gets split — prop count, line count, or responsibility?
-     - The boundary between the shared UI package and app-local components: what earns
-       promotion into the shared package, and what must stay in the app. -->
+- One component per file, `PascalCase.tsx` (see `quzzar-workplace` for naming).
+- **Named exports**, barrelled through the package's `src/index.ts`.
+- Each interactive component wraps a primitive from the accessible-primitives library and is
+  skinned with token CSS — that's what keeps behaviour correct and appearance ours.
+- A file earns promotion into the shared package when a second surface needs it, not when you
+  anticipate one might.
 
-## Styling — vanilla-extract
+## Don't re-implement what the stack already owns
 
-Zero-runtime CSS-in-TypeScript. Styles compile to static CSS at build time via the Vite
-integration, so no style engine ships to the browser. Class names, variables, and theme
-contracts are all type-checked.
+Before adding a hook or a utility, check whether a stack library already covers it. These have
+a settled home:
 
-This is the same bargain as core guideline 4, applied to CSS: the compiler catches a bad token
-reference instead of it silently rendering nothing. So don't route around it — a hardcoded
-value or an inline `style` prop is a type check you've opted out of.
+| Need | Use |
+| --- | --- |
+| local / session storage | Jotai `atomWithStorage` |
+| data fetching, server state | React Query |
+| pagination, row selection, sorting | TanStack Table |
+| input state, masks, validation | React Hook Form + Zod |
+| URL / query-string state | nuqs |
+| focus trap, click-outside, roving tabindex | Radix primitives |
+| slider drag, radial move | Radix Slider or Motion |
 
-Reach for the API that fits:
+A shared hooks library is for what's left over — genuinely generic utilities. Keep its rationale
+at the top of its barrel file so nobody re-implements something the stack already provides.
 
-- `style()` — a single style, with selectors, media queries, pseudo-classes.
-- `styleVariants()` — a named set of variants.
-- `createTheme()` / theme contracts — typed tokens.
-- `createVar()` — CSS variables where a value must change at runtime.
-- `globalStyle()` — sparingly, for genuinely app-wide rules.
-- `createContainer()` — container queries.
+Prefer vendoring a small utility (with attribution) over taking a dependency, when it keeps the
+shared package light.
 
-<!-- TODO: Where `.css.ts` files live relative to their component.
-     - The theme contract's location, and whether raw hex/px is ever acceptable.
-     - Dark mode: how the theme class is applied (the theme is a Jotai atom — how do they meet?).
-     - Responsive strategy — breakpoints in the contract, or container queries by default?
-     - Sprinkles and Recipes: in use, or deliberately not? -->
+## Styling
+
+vanilla-extract — zero-runtime CSS-in-TypeScript, compiled to static CSS at build time via the
+Vite integration. Class names, variables, and theme contracts are type-checked.
+
+This is core guideline 4 applied to CSS: the compiler catches a bad token reference instead of it
+silently rendering nothing.
 
 ## Design tokens
 
-<!-- TODO: The token source of truth, and whether it's shared with the UI package.
-     - What must come from a token rather than a literal. -->
+**Tokens are the source of truth.** A raw hex or px value in a component is a bug — it's a value
+that can't be themed and won't move when the system does.
 
-## Component library — the shared UI package
+Motion has tokens too (duration, easing). Use them rather than hardcoding timings, so animation
+stays consistent across components and respects a single point of change.
 
-Radix (`radix-ui`, unified pkg) provides the accessible primitives under the shared UI
-package's interactive components. `three` must **never** appear inside it.
+## Animation
 
-<!-- TODO: Are shared UI components treated as editable or as vendor?
-     - When to reach for a primitive vs. build bespoke.
-     - How variants are expressed (cva, props, or something else).
-     - What makes a component eligible for the shared package in the first place. -->
+- **Motion is the default** — component enter/exit, layout animations, gestures, parallax.
+- **GSAP is narrow**: SVG plugins (DrawSVG, MorphSVG, MotionPath) and heavy scroll-scrubbed
+  timelines. Not for ordinary component animation.
+- **Overlays are the exception.** Let the primitive library's `data-state` CSS drive overlay
+  enter/exit on the motion tokens. Motion exit through a portal is unreliable — Motion is for
+  layout and gesture polish, not overlay teardown.
+- Respect reduced-motion.
+
+## Accessibility
+
+Accessibility comes from using the primitives, not from patching markup afterwards. Radix
+carries focus management, keyboard interaction, and ARIA wiring for the interactive components
+that wrap it.
+
+If you find yourself hand-writing ARIA attributes, that's usually the signal you should have
+reached for a primitive instead.
 
 ## State
 
-Three stores, three jobs — pick by where the state belongs, not by convenience:
+Three stores, three jobs — pick by where the state belongs:
 
-- **Jotai** — global/client state, atomically (e.g. the theme atom). Also the storage layer,
-  via `atomWithStorage`.
+- **Jotai** — global/client state, atomically. Also the storage layer, via `atomWithStorage`.
 - **nuqs** — URL / query-string state. Filters, tabs, and pagination belong in the URL.
-- **React Query** (`@tanstack/react-query`) — server state and data fetching, in the app's
-  data layer.
-
-Server state does not go in Jotai. URL-worthy state does not go in either.
-
-<!-- TODO: Local `useState` first — at what point does state graduate to a Jotai atom?
-     - When React context is justified vs. prop drilling vs. an atom.
-     - Stance on `useEffect` — where it's legitimate and where it signals a mistake.
-     - Derived state: computed inline or memoized? `useMemo`/`useCallback` threshold. -->
+- **React Query** — server state and data fetching, in the app's data layer.
 
 ## Data fetching
 
-React Query, in the app's data layer. Responses are **parsed through their Zod schema on
-fetch** (core guideline 4) — never cast, never trusted. Schemas come from the shared schema
-package.
+React Query, in the app's data layer. Responses are **parsed through their Zod schema on fetch**
+(core guideline 4) — never cast, never trusted. Schemas come from the shared schema package.
 
 Expect the `ApiResponse` shape from `quzzar-workplace` core guideline 5, and handle `fail`
 (client's fault, per-field) separately from `error` (server's fault).
 
-<!-- TODO: Query key conventions, and where they're defined.
-     - Where a query/mutation hook lives relative to the component using it.
-     - Loading and error UI: Suspense boundaries, skeletons, or inline states?
-     - staleTime / gcTime defaults, and invalidation strategy.
-     - Optimistic updates: standard or exceptional? -->
-
 ## Forms
 
-React Hook Form, with `@hookform/resolvers` bridging to the Zod schema. **One schema, validated
-on both ends** — the form and the server share it, from the shared schema package.
+React Hook Form, with the resolver bridging to the Zod schema. **One schema, validated on both
+ends** — the form and the server share it, from the shared schema package.
 
-<!-- TODO: Where errors render, and how they're announced to screen readers.
-     - Submit state, double-submit prevention, and success feedback (Sonner?).
-     - Validation timing — on blur, on change, on submit? -->
+## UI copy — terse, never verbose
 
-## Tables
+A standing rule, and it holds everywhere:
 
-TanStack Table, headless — sorting, pagination, selection, and column logic.
+- A surface gets a short title and **at most one** short supporting line. Aim well under ten
+  words.
+- Consequences and caveats live in the confirm dialog that gates the action — never as prose
+  above the controls. **Don't narrate; gate.**
+- If copy needs multiple sentences to justify an element, the element is wrong.
 
-<!-- TODO: Where column definitions live, and whether they're shared or per-view.
-     - How table state interacts with nuqs — which parts belong in the URL?
-     - Server-side vs. client-side pagination: the default, and when to switch. -->
+Empty states: a quiet contained box, a title, one short line, one action. No hero graphics, no
+multi-sentence pitches, no feature tours. Reach for a set piece only when asked for a moment,
+not by default.
 
-## Animation
+## The component gallery
 
-- **Motion** (`motion/react`) is the default — enter/exit, layout transitions, gestures,
-  cursor-reactive grid and parallax.
-- **GSAP** is narrow: SVG plugins (DrawSVG, MorphSVG, MotionPath) and heavy scroll-scrubbed
-  timelines (ScrollTrigger). Don't reach for it when Motion covers the case.
-- **Number Flow** for animated number transitions — metrics, counters.
+A standalone internal app renders every shared component with mock props — it's the fidelity
+check, and it stands in for Storybook.
 
-<!-- TODO: Duration and easing defaults. Reduced-motion handling.
-     - What must never animate. -->
+**When you add or change a shared component, add or update its gallery page.** Cover the real
+states the way a story would: variants, sizes, hover/focus/disabled/loading, empty and error.
+The gallery page is how the component gets verified; treat it as the story.
 
-## 3D
+## Testing
 
-`three` (+ `@types/three`), lazy-chunked behind the panel that hosts it. Narrow scope: it is
-**not** a general graphics tool, and it must **never** appear inside the shared UI package.
-
-<!-- TODO: Resource disposal and teardown expectations on unmount.
-     - Performance budget for the scene, and what to do when it's exceeded. -->
-
-## Other UI tools
-
-- **Vaul** — mobile bottom-sheet drawers (responsive dialogs).
-- **Sonner** — toasts and transient notifications.
-- **cmdk** — the command palette (⌘K). Wrap it in a Radix Dialog.
-- **Headless Tree** (`@headless-tree/core` + `/react`) — folder/document trees: drag-move,
-  inline rename, multi-select, keyboard nav. It's the `react-complex-tree` successor, so don't
-  reintroduce the predecessor.
-- **Lucide** (`lucide-react`) — the icon set.
-- **dayjs** — dates and time.
-- **lodash** (`lodash-es`) — deep clone/merge, `groupBy`, `keyBy`, `uniqBy`, and friends.
-
-## Accessibility
-
-<!-- TODO: The bar you hold — WCAG level, or a practical checklist?
-     - Non-negotiables: semantic elements over divs, labels on every input,
-       visible focus, keyboard reachability, contrast minimums.
-     - When ARIA is appropriate vs. a sign Radix should have been used instead.
-     - Whether a11y is checked automatically, and with what. -->
-
-## Performance
-
-Heavy things are lazy-chunked — a `three` scene behind its own panel is the reference case.
-
-<!-- TODO: What you actually care about — LCP/INP/CLS budgets, or bundle size?
-     - Images: the component/loader used, and required attributes.
-     - Fonts: loading strategy.
-     - Beyond the known-heavy cases, is code splitting default or on evidence?
-     - Whether "don't optimize without a measurement" is the rule. -->
-
-## Testing — Playwright
-
-End-to-end against a running app, per `quzzar-workplace`.
-
-<!-- TODO: Query priority — roles and labels over `data-testid`? Stance on test ids.
-     - What's stubbed vs. real (network, time, auth session).
-     - How canvas-based, lazy-chunked views like a `three` scene are handled.
-     - Whether a UI change needs a spec to merge. -->
+Playwright, end-to-end against a running app, per `quzzar-workplace`.
 
 ---
 
 ## Rules
 
-- Tool selection is `quzzar-workplace`'s stack table, not a per-change decision. Something
-  outside it is an `AskUserQuestion`.
+- The stack list is closed. Something outside it is an `AskUserQuestion`.
+- Data, state, and routing libraries never become dependencies of the shared UI package.
 - Fetched data is parsed through its Zod schema. No casting into shape.
+- Tokens, not raw values.
+- Short copy. Don't narrate; gate.
 - `CLAUDE.md` overrides this file — it holds the facts of the repo in front of you.
-- Where this file is silent, the nearest existing component is the convention.
-- Never present a rule from a `<!-- TODO -->` section as established.
-- Deleting an unused component means deleting its styles, stories, tests, and exports too
+- Deleting an unused component means deleting its styles, gallery page, tests, and exports too
   (core guideline 1).

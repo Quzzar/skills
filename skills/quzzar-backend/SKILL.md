@@ -1,19 +1,19 @@
 ---
 name: quzzar-backend
-description: Quzzar's backend conventions — API design, data access and migrations, validation, auth, error handling, background jobs, external integrations, observability, secrets, and backend testing. Use before writing or changing any server-side code, API route, database query, migration, or backend test.
+description: Quzzar's backend conventions — the two runtimes, the single write path, enforcing invariants in Postgres, shared schemas across runtimes, orchestration, secrets, and observability. Use before writing or changing any server-side code, API route, database query, migration, or edge function.
 ---
 
 # quzzar-backend
 
-Backend conventions. Repo-wide rules (naming, commits, dependencies, file organization) live
-in `quzzar-workplace` — read that too for anything not specific to the server layer.
+Backend conventions. Repo-wide rules (naming, file organization, error handling, formatting) live
+in `quzzar-workplace` — read that too.
 
 ## When to use
 
-- Writing or changing an API route, handler, Server Action, or service function.
-- Touching the database — queries, schema, or migrations.
-- Adding auth, validation, a background job, or an external API integration.
-- Writing or fixing a backend test.
+- Writing or changing an API route, handler, edge function, or service function.
+- Touching the database — queries, schema, RLS policies, or migrations.
+- Adding auth, validation, a workflow, or an external integration.
+- Anything involving secrets or deploy configuration.
 
 ## First: read the repo's own context
 
@@ -24,179 +24,138 @@ facts beat anything general below. If it has no `<!-- quzzar-skills:start -->` b
 ## Tool choices are already decided
 
 **Which** tool to use is fixed by the stack table in `quzzar-workplace` — bun, Temporal, Deno,
-Supabase, GitHub Actions, Langfuse, Zod, Playwright. Read it and use what it says.
+Supabase, GitHub Actions, Langfuse, Zod, Playwright.
 
-This skill covers **how** we use them. Adding a second datastore or auth vendor is explicitly
-out; anything else outside the table is an `AskUserQuestion`, not a judgment call.
-
-## Handling unfilled sections
-
-Sections marked `<!-- TODO -->` have no convention recorded yet.
-
-**Do not invent one.** Match the nearest existing handler or query, and name the missing
-convention in your report. If existing code disagrees and the choice matters, use
-`AskUserQuestion`.
+The list is closed. A second datastore or auth vendor is explicitly out; anything else outside
+the table is an `AskUserQuestion`, not a judgment call.
 
 ---
 
-## Runtime — two runtimes, don't mix them up
+## Two runtimes — don't mix them up
 
 - **bun** — runtime *and* package manager for service packages and the workspace root.
   **Never npm.**
-- **Deno** — the Supabase edge-function runtime. **Not bun.**
+- **Deno** — the edge-function runtime. **Not bun.**
 
 Check which context you're in before writing a runtime-specific import or a lockfile-touching
 command. Code written for one does not necessarily run on the other.
 
-<!-- TODO: Which APIs are safe to share between the bun and Deno sides, and how shared code
-     is structured so it runs on both.
-     - Execution limits on the edge-function side that shape how handlers are written. -->
+## Shared schemas across runtimes
 
-## API design
-
-Every response follows the `ApiResponse<T, F>` shape from `quzzar-workplace` core guideline 5.
-The three-way split is load-bearing: `success`, `fail` (client's fault — validation and
-business rules, per-field in `data`), `error` (server's fault — `message` safe to surface,
-never leaking internals).
-
-<!-- TODO: Route/procedure naming and URL shape.
-     - Which HTTP status codes accompany fail vs. error, and what a client can rely on.
-     - Versioning: how, or explicitly not.
-     - Pagination style (cursor vs. offset) and its standard param names. -->
-
-## Layering
-
-<!-- TODO: How a request flows — handler → service → data access, or thinner?
-     - What a handler is allowed to do directly vs. must delegate.
-     - Where business logic must NOT live.
-     - Whether Supabase client types are allowed to leak to callers. -->
-
-## Validation
-
-Zod, from the shared schema package. Every cross-boundary shape has a schema — wire shapes,
-intake, agent contracts, and form validation via the RHF resolver. **One schema, validated on
-both ends.**
+Every cross-boundary shape is a Zod schema in the shared schema package — wire shapes, intake,
+agent contracts, and form validation via the RHF resolver. **One schema, validated on both ends.**
 
 Objects are **parsed** at the boundary, not cast (core guideline 4). Types are derived from
 schemas rather than declared alongside them.
 
-<!-- TODO: What happens on a parse failure at each boundary — which become `fail` responses,
-     which are `error`, and which are non-recoverable.
-     - Whether internal service-to-service calls re-parse, or trust the caller. -->
+Two things bite when one package is consumed as source by both runtimes:
 
-## Data access — Supabase
+- **Relative imports need explicit `.ts` extensions** — Deno rejects extensionless imports, and
+  every tsc consumer then needs `allowImportingTsExtensions`. Type-check against *both* runtimes
+  after touching the shared package, not just the one you're working in.
+- **If a bundler can't reach outside its workdir**, the schemas get copied in-tree instead.
+  That copy is a **build artifact**: gitignored, generated by a script, never hand-edited and
+  never reviewed. A fresh checkout needs the sync run before type-checking will pass.
 
-Postgres is the control plane, with **RLS**. Auth and Storage are Supabase too. Don't add a
-second datastore or auth vendor.
+## The single write path
 
-<!-- TODO: Where query code lives, and whether queries are reusable functions or inline.
-     - Raw SQL: allowed, and when, vs. the Supabase client?
-     - Transaction boundaries — who opens one, and what must be inside it.
-     - RLS as the enforcement point vs. checks in application code — which is authoritative?
-     - Soft delete or hard delete? Timestamp columns on every table? -->
+The pattern that makes authorization tractable:
+
+- **Reads** are scoped by RLS policies in Postgres.
+- **No insert/update policies at all** → writes are service-role only → **the API layer is the
+  sole write path.**
+
+This means a client can never write directly, and every mutation goes through one reviewable
+place. Don't add a write policy to work around a hard-to-reach endpoint; that quietly reopens
+the surface the design closes.
+
+Use SECURITY DEFINER helper functions to break membership-table self-recursion in policies, and
+keep visibility resolution in a single function that the SELECT policy calls — one place to
+reason about who can see what.
+
+## Enforce invariants in Postgres
+
+Limits, capacity, and uniqueness belong in the database — BEFORE triggers with advisory locks,
+partial unique indexes — not only in application code. Application checks race; the database
+doesn't.
+
+The API layer's job is to *map* a database rejection onto a good response (core guideline 5:
+a limit hit is `fail`, the client's fault, not `error`).
+
+**Keep a repeatable access test** covering the permission matrix, limits, and lockdown, and run
+it after *any* schema, RLS, or permission-function change. Policy changes are the class of edit
+where "it looks right" is worth least.
 
 ## Migrations
 
-<!-- TODO: The Supabase migration workflow — how they're generated, reviewed, and applied.
-     - Backwards-compatibility requirement: must a migration be safe to deploy before the
-       code that uses it?
-     - How destructive changes are staged (note: core guideline 1 wants dead columns gone,
-       so record how that lands safely across a release).
-     - Seeding, and whether it runs in any non-local environment. -->
+Migrations are reviewed like code, and must be safe to deploy *before* the code that uses them.
 
-## Auth
+Destructive changes are staged rather than dropped in one step — core guideline 1 wants dead
+columns gone, and the promotion path in `quzzar-workplace` (`dev → staging → main`) is what makes
+that safe: the removal gets exercised at each stop before it reaches `main`.
 
-Supabase Auth, with RLS in Postgres.
+## Orchestration
 
-<!-- TODO: Where the session is read, and where authorization is enforced — RLS, handler,
-     or both?
-     - Is every endpoint protected by default or opt-in?
-     - How row ownership / tenancy is expressed in policies.
-     - Service-to-service auth for internal calls and the runner. -->
+Durable orchestration for long-running pipelines. **One task queue per pipeline, each with its
+own worker entry point** — deliberately separate so a local `pkill` can't cross-kill the other
+workers.
 
-## Orchestration — Temporal
+Keep that separation when adding workers; a shared entry point reintroduces the exact problem
+it exists to prevent.
 
-Durable orchestration for long-running pipelines.
+## API design
 
-One task queue per pipeline, each with its **own worker entry point** — deliberately separate
-so a local `pkill` can't cross-kill the other workers.
-
-Keep that separation when adding workers — a shared entry point reintroduces the cross-kill
-problem it exists to prevent.
-
-<!-- TODO: Activity idempotency requirements, and what must be safe to retry.
-     - Retry policy and timeout defaults; where they're configured.
-     - What belongs in a workflow vs. an activity.
-     - Versioning long-running workflows when their code changes.
-     - How a failed run surfaces (and how that relates to Langfuse). -->
-
-## The runner
-
-GitHub Actions hosts the runner today — free tier, roughly 2000 min/month. An always-on VM is
-the known upgrade path.
-
-<!-- TODO: What the minute budget means in practice — what's safe to run in CI vs. what needs
-     the VM, and the signal that it's time to migrate. -->
-
-## Errors
-
-The client-facing shape is fixed by core guideline 5. Internals never leak through
-`error.message`.
-
-<!-- TODO: Custom error classes — do they exist, and where?
-     - Which failures are expected (return a `fail`) vs. exceptional (throw).
-     - Retry policy for transient failures outside Temporal.
-     - What must never be caught-and-ignored. -->
-
-## External integrations
-
-<!-- TODO: How third-party APIs are wrapped — a client module per service?
-     - Timeout and retry defaults.
-     - Webhook handling: signature verification, idempotency keys, replay safety.
-     - How a non-critical dependency's failure degrades rather than breaks the request. -->
+Every response follows the `ApiResponse<T, F>` shape from `quzzar-workplace` core guideline 5.
+The three-way split is load-bearing: `success`, `fail` (client's fault — validation and business
+rules, per-field in `data`), `error` (server's fault — `message` safe to surface, never leaking
+internals).
 
 ## Config and secrets
 
-<!-- TODO: Where env vars are declared and validated — a single Zod-parsed config module?
-     (Core guideline 4 points that way; record it if so.)
-     - The rule against reading `process.env` / `Deno.env` outside it.
-     - How secrets differ across bun, Deno, GitHub Actions, and Supabase.
-     - What happens at boot if a required var is missing. -->
+- Secrets live in gitignored local env files and as platform secrets in production.
+  **Never in the frontend bundle.**
+- **Rotate anything that gets pasted into a chat, ticket, or PR.** Treat exposure as having
+  happened, not as a risk to assess.
+- Each runtime and each host reads secrets differently. When adding one, account for every place
+  it has to exist — local, CI, and the deploy target — or it will fail in exactly the one you
+  forgot.
 
-## Observability — Langfuse
+## Deploy
 
-Tracing and quality scores for pipeline runs.
+Verify deploy configuration explicitly rather than trusting defaults — a per-function auth
+setting that defaults the wrong way will silently gateway-lock a function on its *next* deploy,
+long after the change that caused it.
 
-<!-- TODO: What must be traced — every run, or specific activities?
-     - Which quality scores are recorded, and what a bad score triggers.
-     - Logger of record outside Langfuse, and the rule on `console.*`.
-     - What must never appear in a trace or log (PII, tokens, full payloads). -->
+**Smoke-test after deploying.** An unauthenticated request should return your handler's own
+response, not the platform's — that distinction is what tells you the function is actually
+reachable.
 
-## Testing — Playwright
+## Observability
 
-End-to-end against a running app, per `quzzar-workplace`. Note that an e2e-first tool covers
-API surface reached through the app; workflows and activities that no request path touches need
-a deliberate answer below.
+Langfuse for tracing and quality scores on pipeline runs.
 
-<!-- TODO: Real Supabase instance or a seeded test project? If real, how it's isolated per run.
-     - How Temporal workflows are tested (test environment, time-skipping) — Playwright won't
-       reach these on its own.
-     - How external APIs are handled (fixtures, sandbox credentials).
-     - Whether a new endpoint needs a spec to merge. -->
+Never put PII, tokens, or full request payloads in a trace or a log. Logging is wanted
+(`quzzar-workplace` error handling) — logging secrets is not.
+
+## Testing
+
+Playwright, end-to-end against a running app, per `quzzar-workplace`.
+
+Note the gap: an e2e-first tool only reaches backend surface exposed through a request path.
+Workflows, activities, and permission policies that no request touches need their own coverage —
+the access test above is part of that answer.
 
 ---
 
 ## Rules
 
-- Tool selection is `quzzar-workplace`'s stack table, not a per-change decision. A second
-  datastore or auth vendor is out; anything else outside the table is an `AskUserQuestion`.
-- **Never npm.** bun for service packages and the workspace root; Deno for Supabase edge
-  functions.
-- Every cross-boundary shape is a Zod schema in the shared schema package, parsed at the
-  boundary and shared by both ends.
+- The stack list is closed. A second datastore or auth vendor is out.
+- **Never npm.** bun for service packages and the workspace root; Deno for edge functions.
+- Reads via RLS, writes service-role only, through one path. Don't add a write policy.
+- Invariants belong in Postgres, not only in application code.
+- Every cross-boundary shape is a Zod schema, parsed at the boundary, shared by both ends.
 - Every response is `ApiResponse<T, F>`. `fail` is the client's fault, `error` is ours.
+- Rotate any secret that gets pasted anywhere.
 - `CLAUDE.md` overrides this file — it holds the facts of the repo in front of you.
-- Where this file is silent, the nearest existing handler or query is the convention.
-- Never present a rule from a `<!-- TODO -->` section as established.
-- Deleting an unused endpoint means deleting its schema, tests, types, and any orphaned
-  migration path too (core guideline 1).
+- Deleting an unused endpoint means deleting its schema, tests, types, and policies too
+  (core guideline 1).

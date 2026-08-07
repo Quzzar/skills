@@ -29,9 +29,6 @@ the dimensions it actually holds a standard on — if it has a rule about barrel
 whether the repo uses them; if it says nothing about them, don't spend the reading budget.
 That way Step 4's comparison lines up one-to-one instead of guessing which findings matter.
 
-Skip the dimensions marked `<!-- TODO -->` — there's no standard to compare them against, so
-surveying them produces nothing you can act on.
-
 **Tooling** — what the repo already uses:
 
 | Fact | Where to look |
@@ -174,9 +171,8 @@ yourself — nothing here is handed off.
 1. Re-read the `quzzar-workplace` sections you surveyed against. That's the standard.
 2. For each one, state what the standard says and what the code actually does. A match needs
    one word; a gap needs the specifics.
-3. Sections still marked `<!-- TODO -->` have **no standard recorded**. Do not invent one,
-   and do not generate cleanup work from them. List which were empty — that's what the user
-   should fill in to make the next run more useful.
+3. If `quzzar-workplace` says nothing about a dimension, it isn't a gap. Don't invent a
+   standard to measure against, and don't generate cleanup work from silence.
 
 Report it like this:
 
@@ -185,7 +181,7 @@ Report it like this:
 > **Gaps:**
 > - <dimension> — standard says <X>; code does <Y>. Affects <where, roughly how many files>.
 >
-> **No standard recorded yet** (fill these in to widen the check): <sections>
+> **Not covered by the standard** (so not assessed): <dimensions>
 
 Order the gaps by how much they'd cost to leave alone, not by how easy they'd be to fix.
 

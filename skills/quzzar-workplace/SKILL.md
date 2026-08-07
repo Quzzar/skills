@@ -1,6 +1,6 @@
 ---
 name: quzzar-workplace
-description: Quzzar's core engineering guidelines and canonical tool stack — dead-code deletion, consolidation, when to ask for alignment, strict TypeScript and Zod, the standard API response shape, plus repo process (issues, branches, commits, PRs, CI). Read before starting any work in a quzzar repo.
+description: Quzzar's core engineering guidelines and canonical tool stack — dead-code deletion, consolidation, when to ask for alignment, strict TypeScript and Zod, the standard API response shape, plus naming, file organization, error handling, comments, and formatting. Read before starting any work in a quzzar repo.
 ---
 
 # quzzar-workplace
@@ -200,9 +200,9 @@ unions, which the result types in [Error handling](#error-handling) need.
 Spell words out. `resolveSite`, not `resSite`. The exceptions are terms already standard in the
 domain or the platform (`url`, `id`, `db`, `otp`, `ui`).
 
-**camelCase filenames are wrong, including where you find them.** Existing code has some —
-`resolveSite.ts`, `siteModels.ts` sitting next to `asset-layer.ts` in the same directory. That's
-drift, not a second convention. Write `resolve-site.ts`.
+**camelCase filenames are wrong, including where you find them.** You will find them — a
+`resolveSite.ts` sitting next to an `asset-layer.ts` in the same directory. That's drift, not a
+second convention. Write `resolve-site.ts`.
 
 This is the one place where "match the surrounding code" does **not** apply. A wrong neighbour
 is not a precedent — matching it is how the drift spread in the first place. Directories are
@@ -269,4 +269,3 @@ Without it the two fight over the same lines and every save flips the file back 
 - Where this file is silent, the surrounding code is the convention. Match it and say so.
 - Where this file is **not** silent, it beats the surrounding code. Existing code that breaks a
   rule recorded here is drift to be corrected, not a local convention to be matched.
-- Never report a convention as established when it came from a `<!-- TODO -->` section.
