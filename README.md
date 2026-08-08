@@ -63,20 +63,26 @@ and deselecting rewrites the list.
 | [`setup`](skills/setup/SKILL.md) | Run once per repo. Surveys the stack and existing practices, writes the skill-routing block into `CLAUDE.md`, installs Matt Pocock's skills, and reports where the code falls short of `quzzar-workplace`. |
 | [`quzzar-workplace`](skills/quzzar-workplace/SKILL.md) | The five core guidelines, the canonical tool stack, the top-level `docs/` knowledge tree, and repo-wide rules: naming, file organization, error handling, comments, formatting. Read before any work. |
 | [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | The layer boundary, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, the component gallery. |
+| [`quzzar-design`](skills/quzzar-design/SKILL.md) | Visual quality. The plan that precedes the code, the AI-default aesthetics to avoid, and the render-screenshot-critique loop that stops an agent shipping a layout it never looked at. |
 | [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | The two runtimes, shared schemas across runtimes, the single write path, invariants in Postgres, orchestration, secrets, deploys, observability. |
 
 ### How they get invoked
 
 `setup` writes a marker-fenced block into the repo's `CLAUDE.md` that routes agents to the right
-skill: `quzzar-workplace` for any work, then `quzzar-frontend` or `quzzar-backend` by layer.
-`CLAUDE.md` loads into every session automatically, so that block is what makes the conventions
-apply without anyone remembering to ask.
+skill: `quzzar-workplace` for any work, then `quzzar-frontend` or `quzzar-backend` by layer, and
+`quzzar-design` on top of those for visual work. `CLAUDE.md` loads into every session
+automatically, so that block is what makes the conventions apply without anyone remembering to
+ask.
 
-`setup` also records the repo's real stack and commands into that block, and all three skills
-treat it as authoritative: the skills hold preferences that travel between repos, `CLAUDE.md`
+`setup` also records the repo's real stack and commands into that block, and every other skill
+treats it as authoritative: the skills hold preferences that travel between repos, `CLAUDE.md`
 holds the facts of the repo in front of you.
 
-**Run `setup` first in a new repo.** The other three assume its block exists.
+It writes one more file: `.claude/launch.json`, naming how to start each runnable app and on
+what port. That's what lets a later session actually render the UI it just wrote instead of
+guessing at it, which is the loop `quzzar-design` is built around.
+
+**Run `setup` first in a new repo.** The others assume its block exists.
 
 ## Scope
 
@@ -104,7 +110,7 @@ project skill, not here.
 
 ## Also installable as a Claude Code plugin
 
-Claude-only by construction, versioned, and all four skills come as one unit:
+Claude-only by construction, versioned, and all five skills come as one unit:
 
 ```bash
 claude plugin marketplace add Quzzar/skills

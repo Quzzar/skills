@@ -1,12 +1,13 @@
 ---
 name: setup
-description: Set up a repo to use the quzzar skills. Surveys the existing stack and practices, writes the skill-routing block into CLAUDE.md, installs Matt Pocock's skills, then reports where the codebase falls short of quzzar-workplace standards. Use when the user runs /setup or asks to set up the quzzar skills in a repo.
+description: Set up a repo to use the quzzar skills. Surveys the existing stack and practices, writes the skill-routing block into CLAUDE.md, wires up .claude/launch.json so agents can run and see the app, installs Matt Pocock's skills, then reports where the codebase falls short of quzzar-workplace standards. Use when the user runs /setup or asks to set up the quzzar skills in a repo.
 ---
 
 # setup
 
-Point this repo's agents at the `quzzar-*` skills, install the supporting toolkit, then report
-where the codebase doesn't yet meet those standards.
+Point this repo's agents at the `quzzar-*` skills, give them a way to run and see the app,
+install the supporting toolkit, then report where the codebase doesn't yet meet those
+standards.
 
 Run once per repo. Re-running is safe. Every write below is idempotent.
 
@@ -22,12 +23,12 @@ configuring CI. This skill wires up the quzzar skills and nothing else.
 ## Step 1. Survey what's already here
 
 Read the repo before writing anything to it. You need this both for the CLAUDE.md block and
-for the gap report in Step 4.
+for the gap report in Step 5.
 
 **Read the `quzzar-workplace` skill first, and let its section list drive the survey.** Survey
 the dimensions it actually holds a standard on. If it has a rule about barrel files, look at
 whether the repo uses them; if it says nothing about them, don't spend the reading budget.
-That way Step 4's comparison lines up one-to-one instead of guessing which findings matter.
+That way Step 5's comparison lines up one-to-one instead of guessing which findings matter.
 
 **Tooling**, what the repo already uses:
 
@@ -36,6 +37,7 @@ That way Step 4's comparison lines up one-to-one instead of guessing which findi
 | Package manager | Lockfile: `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `bun.lockb` |
 | Layout | `pnpm-workspace.yaml`, `turbo.json`, `workspaces` in `package.json` |
 | Frontend | `dependencies`: `next`, `react`, `vue`, `svelte`, `astro` |
+| Dev server | The `dev` script of **every** runnable app, plus the port each one serves on |
 | Backend / runtime | `wrangler.jsonc`, `vercel.json`/`vercel.ts`, `hono`, `express`, `fastify` |
 | Database / ORM | `drizzle.config.*`, `prisma/`, `pg`, `d1_databases` in wrangler config |
 | Styling | `tailwind.config.*`, `components.json` (shadcn), `*.module.css` |
@@ -107,6 +109,10 @@ Then, before writing code, read the skill for the layer you're touching:
 Read the layer skill *before* writing, not as a check afterwards. A change spanning both
 layers needs both.
 
+For visual work, also read **`quzzar-design`**: the visual plan that comes before the code,
+and the render-screenshot-critique loop. Never report a visual change as done without having
+looked at it rendered.
+
 ### Stack
 
 <!-- filled in by /setup from the repo itself. Correct it by hand if it drifts -->
@@ -129,7 +135,54 @@ command in `CLAUDE.md` misleads every future session.
 
 ---
 
-## Step 3. Install Matt Pocock's skills
+## Step 3. Give the agent eyes
+
+An agent that can't render the app can't tell whether the UI it wrote is any good, so it
+guesses and reports success. `quzzar-design` is built on closing that loop, and this step is
+what makes the loop reachable without every future session rediscovering how to start the app.
+
+**Skip this step entirely if the repo has no runnable frontend.** A service-only repo has
+nothing to look at.
+
+Write `.claude/launch.json`, one configuration per app a person would open in a browser:
+
+```json
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
+    }
+  ]
+}
+```
+
+- `runtimeExecutable` and `runtimeArgs` come from the **real** `dev` script you recorded in
+  Step 1, split into command and arguments. Don't guess the package manager: use the one the
+  lockfile proves.
+- `port` must be the port that app actually serves on. A wrong port produces a blank pane and
+  a confusing debugging session later.
+- **Include the component gallery as its own configuration** if the repo has one. It's the
+  cheapest visual verification surface there is, since it renders every component state on one
+  page with no auth and no seed data.
+- In a monorepo, give each app its own entry with a `name` matching the workspace, and set the
+  working directory through the arguments the package manager already provides (for example
+  `["run", "--filter", "gallery", "dev"]`).
+
+Two things to get right:
+
+- **The file already exists**: merge by `name`. Add configurations that are missing, leave
+  existing ones alone, and never drop one you didn't add. It's a file the user maintains.
+- **Verify before writing.** Start each app once and confirm it serves on the port you're about
+  to record. An unverified `launch.json` is worse than none, because it will be trusted.
+
+Add `.claude/launch.json` to the repo rather than to `.gitignore`. The point is that every
+future session on any machine gets the same loop.
+
+## Step 4. Install Matt Pocock's skills
 
 They're part of the standard toolkit for a quzzar repo: TDD, code review, diagnosing bugs,
 domain modeling, and the rest. Install them so they're available alongside the quzzar skills.
@@ -154,7 +207,7 @@ claude plugin update mattpocock-skills
 
 **A plugin install or update needs a session restart to take effect.** His skills won't be
 available for the rest of this session, so don't attempt to use one. Tell the user to restart
-and note that the toolkit lands then. Step 4 doesn't depend on them, so setup still finishes
+and note that the toolkit lands then. Step 5 doesn't depend on them, so setup still finishes
 in full.
 
 Worth mentioning in your final report: `/setup-matt-pocock-skills` configures the issue
@@ -163,7 +216,7 @@ recommend it as a next step rather than trying to run it.
 
 ---
 
-## Step 4. Report where the codebase falls short
+## Step 5. Report where the codebase falls short
 
 Now compare the Step 1 survey against the standard, and report the gaps. You do this
 yourself, and nothing here is handed off.
@@ -202,6 +255,9 @@ restart) for a broader architectural scan presented as a report to choose from.
 - Survey before writing. Every question you ask about something discoverable in the repo is
   a question you shouldn't have asked.
 - Never overwrite `CLAUDE.md`. Insert between markers, preserve the rest, confirm first.
+- Verify every command and port before recording it, in `CLAUDE.md` and in `launch.json` alike.
+  A wrong one is trusted by every future session, which is worse than an absent one.
+- Merge `.claude/launch.json` by `name`. Never drop a configuration you didn't add.
 - Never invent a convention because a `quzzar-workplace` section was empty. An empty section
   means *ask*, not *assume*.
 - Report gaps; don't fix them. A convention sweep is its own scoped change.

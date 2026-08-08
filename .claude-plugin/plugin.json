@@ -1,6 +1,6 @@
 {
   "name": "quzzar-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Quzzar's agent skills.",
   "author": {
     "name": "Quzzar",
@@ -16,6 +16,7 @@
     "./skills/setup",
     "./skills/quzzar-workplace",
     "./skills/quzzar-frontend",
+    "./skills/quzzar-design",
     "./skills/quzzar-backend"
   ]
 }

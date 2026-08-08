@@ -8,6 +8,10 @@ description: Quzzar's frontend conventions covering the layer boundary between s
 Frontend conventions. Repo-wide rules (naming, file organization, error handling, formatting)
 live in `quzzar-workplace`. Read that too.
 
+This file covers **how to write** UI code. Whether the result actually looks good, and how to
+render and critique it instead of guessing, is `quzzar-design`. Read that as well for anything
+where "does it look right" is the real acceptance criterion.
+
 ## When to use
 
 - Writing or changing a component, page, layout, or route.
@@ -156,6 +160,10 @@ check, and it stands in for Storybook.
 states the way a story would: variants, sizes, hover/focus/disabled/loading, empty and error.
 The gallery page is how the component gets verified; treat it as the story.
 
+It's also the screenshot target. Because it renders every state on one page with no auth and no
+seed data, it's the cheapest surface to point a browser at when verifying visual work. See
+`quzzar-design`.
+
 ## Testing
 
 Playwright, end-to-end against a running app, per `quzzar-workplace`.
@@ -169,6 +177,7 @@ Playwright, end-to-end against a running app, per `quzzar-workplace`.
 - Fetched data is parsed through its Zod schema. No casting into shape.
 - Tokens, not raw values.
 - Short copy. Don't narrate; gate.
+- Never report a visual change as done without rendering it and looking at it (`quzzar-design`).
 - `CLAUDE.md` overrides this file. It holds the facts of the repo in front of you.
 - Deleting an unused component means deleting its styles, gallery page, tests, and exports too
   (core guideline 1).
