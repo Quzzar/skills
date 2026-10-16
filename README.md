@@ -61,10 +61,10 @@ and deselecting rewrites the list.
 | Skill | What it does |
 | --- | --- |
 | [`setup`](skills/setup/SKILL.md) | Run once per repo. Surveys the stack and existing practices, writes the skill-routing block into `CLAUDE.md`, installs Matt Pocock's skills, and reports where the code falls short of `quzzar-workplace`. |
-| [`quzzar-workplace`](skills/quzzar-workplace/SKILL.md) | The five core guidelines, the canonical tool stack, the top-level `docs/` knowledge tree, and repo-wide rules: naming, file organization, error handling, comments, formatting. Read before any work. |
+| [`quzzar-workplace`](skills/quzzar-workplace/SKILL.md) | The five core guidelines, language selection (TypeScript with Bun, Python with uv, Rust with Cargo), the canonical tool stack, the top-level `docs/` knowledge tree, and repo-wide code rules. Read before any work. |
 | [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | The layer boundary, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, the component gallery. |
 | [`quzzar-design`](skills/quzzar-design/SKILL.md) | Visual quality. The plan that precedes the code, the AI-default aesthetics to avoid, and the render-screenshot-critique loop that stops an agent shipping a layout it never looked at. |
-| [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | The two runtimes, shared schemas across runtimes, the single write path, invariants in Postgres, orchestration, secrets, deploys, observability. |
+| [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | Backend language toolchains, Rust implementation and checks, shared contracts across languages and runtimes, the single write path, invariants in Postgres, orchestration, secrets, deploys, observability. |
 
 ### How they get invoked
 

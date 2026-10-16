@@ -34,20 +34,23 @@ That way Step 5's comparison lines up one-to-one instead of guessing which findi
 
 | Fact | Where to look |
 | --- | --- |
-| Package manager | Lockfile: `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `bun.lockb` |
+| Languages / toolchains | `package.json`, `pyproject.toml`, `Cargo.toml`, `rust-toolchain.toml`; include every language in a mixed repo |
+| Package manager | Lockfile: `bun.lock`, `bun.lockb`, `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `uv.lock`, `Cargo.lock` |
 | Layout | `pnpm-workspace.yaml`, `turbo.json`, `workspaces` in `package.json` |
 | Frontend | `dependencies`: `next`, `react`, `vue`, `svelte`, `astro` |
 | Dev server | The `dev` script of **every** runnable app, plus the port each one serves on |
-| Backend / runtime | `wrangler.jsonc`, `vercel.json`/`vercel.ts`, `hono`, `express`, `fastify` |
+| Backend / runtime | Deploy config, service entry points, `wrangler.jsonc`, `vercel.json`/`vercel.ts`, `hono`, `express`, `fastify`, Python manifests, Cargo targets |
 | Database / ORM | `drizzle.config.*`, `prisma/`, `pg`, `d1_databases` in wrangler config |
 | Styling | `tailwind.config.*`, `components.json` (shadcn), `*.module.css` |
-| Tests | `vitest`, `jest`, `playwright`, and the `scripts` block |
-| Typecheck / lint / format | `scripts`; `tsconfig.json` `strict`; `biome.json`, `.eslintrc*`, `.prettierrc*` |
+| Tests | `vitest`, `jest`, `playwright`, package scripts, Python test config, Cargo test targets, and CI commands |
+| Typecheck / lint / format | Package scripts; `tsconfig.json` `strict`; `biome.json`, `.eslintrc*`, `.prettierrc*`; Python tools in `pyproject.toml`; Rust toolchain, rustfmt, Clippy, and CI flags |
 | CI | `.github/workflows/`: what runs, and what blocks merge |
 | Issue tracker | `.github/ISSUE_TEMPLATE/`, Linear-style branch names in `git log` |
 
-Record the **real commands** from the `scripts` block, verbatim. `pnpm test` and
-`pnpm run test:unit` are not interchangeable.
+Record the **real commands** from package scripts, project configuration, and CI, verbatim.
+Include language-specific commands, working directories, and Rust workspace, target, or feature
+flags. `pnpm test` and `pnpm run test:unit` are not interchangeable. Report the existing
+toolchains; this survey does not migrate a repo to Bun, uv, or Rust.
 
 The tooling table above is surveyed regardless. `CLAUDE.md` needs it whether or not
 `quzzar-workplace` has an opinion.
@@ -117,6 +120,7 @@ looked at it rendered.
 
 <!-- filled in by /setup from the repo itself. Correct it by hand if it drifts -->
 
+- Languages / toolchains:
 - Package manager:
 - Frontend:
 - Backend / runtime:

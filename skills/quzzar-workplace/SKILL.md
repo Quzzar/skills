@@ -1,6 +1,6 @@
 ---
 name: quzzar-workplace
-description: Quzzar's core engineering guidelines and canonical tool stack, covering dead-code deletion, consolidation, when to ask for alignment, strict TypeScript and Zod, the standard API response shape, the top-level docs/ knowledge tree, plus naming, file organization, error handling, comments, and formatting. Read before starting any work in a quzzar repo.
+description: Quzzar's core engineering guidelines and canonical tool stack, covering language selection with TypeScript, Python, and Rust, dead-code deletion, consolidation, when to ask for alignment, types and validation, the standard API response shape, the top-level docs/ knowledge tree, plus naming, file organization, error handling, comments, and formatting. Read before starting any work in a quzzar repo.
 ---
 
 # quzzar-workplace
@@ -67,15 +67,16 @@ the UI tool that renders selectable options. Give a few distinct options to pick
 This is the preferred way to resolve ambiguity. Reach for it early rather than guessing and
 building the wrong thing.
 
-## 4. Strict types, Zod schemas, clean documented code
+## 4. Strict types, validated schemas, clean documented code
 
-- **Full strict TypeScript**, always. Every strict flag on.
-- **Zod for every schema.** Objects are **parsed** through their Zod schema on fetch: validated
-  at the boundary, not trusted and cast later.
-- **Always explicit types. No implicit types.**
-- **`as` casts should be rare.** A cast is a signal the types are wrong somewhere upstream.
-  Fix that instead. If a cast is genuinely unavoidable, say why.
-- **JSDoc-style documentation** on the code we write. Clean, readable, documented.
+- **Full strict TypeScript**, whenever writing TypeScript. Every strict flag on, explicit
+  types, and Zod schemas parsed at the boundary rather than trusted casts. Keep `as` casts
+  rare; fix the upstream types, or explain why a cast is unavoidable.
+- **Rust uses its native type system.** Model states and invariants with structs, enums,
+  ownership, and `Result`. Use safe Rust by default and validate external input at runtime.
+- **Python uses type annotations and runtime boundary validation.**
+- Use each language's documentation conventions: JSDoc for TypeScript, rustdoc for Rust,
+  docstrings for Python. Keep the code clean, readable, and documented.
 
 ## 5. Standard API response shape
 
@@ -101,6 +102,28 @@ The distinction matters and isn't optional:
 
 These are our main solutions to problems, the core tools we should be building with. Reach
 for something outside this table only with a reason.
+
+## Language selection
+
+**TypeScript is the default. Rust and Python are first-class choices when they fit the work.**
+
+| Language | When to choose it | Toolchain |
+| --- | --- | --- |
+| **TypeScript** | Web apps, product APIs, integrations, and orchestration. | **Bun** for the runtime, packages, and scripts; Deno where the host requires it, such as Supabase edge functions. |
+| **Python** | Work that benefits from Python's data, ML, scientific, or automation ecosystem. | **uv** for dependencies, environments, and execution. |
+| **Rust** | Backend services, workers, and complex processing where performance, memory control, concurrency safety, or strongly modeled invariants materially improve the result. | **Cargo** for dependencies, builds, tests, and execution. |
+
+Actively consider Rust for CPU-heavy processing, parsers, concurrent systems, resource-limited
+services, and domain engines where ownership and exhaustive state modeling prevent costly
+mistakes. It can be the right choice for a whole service or a focused component from the start.
+Its compiler feedback is useful during AI-assisted development; passing compilation still
+needs behavioral tests.
+
+Choose against the actual requirements, deployment target, libraries, and maintenance cost.
+Routine CRUD and integration glue usually stay in TypeScript; complexity alone is not a reason
+to switch languages. For a performance-driven rewrite, profile the existing code and compare
+the affected workload. Keep an existing codebase's language unless a concrete benefit warrants
+the change, and explain that benefit when introducing Rust or another language boundary.
 
 ## Frontend: the base of every web app
 
@@ -139,16 +162,18 @@ for something outside this table only with a reason.
 
 | Tool | Role |
 | --- | --- |
-| **Zod** | Every cross-boundary schema: wire shapes, intake, agent contracts, and form validation via the RHF resolver. Lives in a shared schema package. **One schema, validated on both ends.** |
-| **Playwright** | Testing. The test tool of record, end-to-end against a running app. |
-| **dayjs** | Dates and time. |
-| **lodash** (`lodash-es`) | General utilities: deep clone/merge, `groupBy`, `keyBy`, `uniqBy`… |
+| **Zod** | Cross-boundary schemas in TypeScript: wire shapes, intake, agent contracts, and form validation via the RHF resolver. Lives in a shared schema package. For other languages, follow the contract guidance in `quzzar-backend`. |
+| **Playwright** | End-to-end testing against a running web app, alongside language-native tests for backend logic. |
+| **dayjs** | Dates and time in TypeScript. |
+| **lodash** (`lodash-es`) | General TypeScript utilities: deep clone/merge, `groupBy`, `keyBy`, `uniqBy`… |
 
 ## Backend
 
 | Tool | Role |
 | --- | --- |
-| **bun** | Runtime + package manager for service packages and the workspace root. **Never npm.** |
+| **Bun** | Runtime + package manager for TypeScript service packages and JavaScript workspace tooling. **Never npm.** |
+| **uv** | Python dependencies, environments, and execution. |
+| **Cargo** | Rust dependencies, builds, tests, and execution. |
 | **Temporal** | Durable orchestration for long-running pipelines. One task queue per pipeline, each with its own worker entry point so a local `pkill` can't cross-kill the others. |
 | **Deno** | The edge-function runtime (Supabase functions). **Not bun.** |
 | **Supabase** | Postgres (control plane + RLS), Auth, Storage. The whole managed backend. **Don't add a second datastore or auth vendor.** |
@@ -234,6 +259,10 @@ Types, schemas, documentation, and the API response shape are covered in
 
 ## Naming
 
+The naming rules in this section cover TypeScript. Rust and Python use their native naming
+and module conventions, including `snake_case` identifiers and module filenames. Keep directory
+naming consistent with that language's tooling and the repo.
+
 | Thing | Casing | Example |
 | --- | --- | --- |
 | Component file | `PascalCase.tsx` | `SettingsPanel.tsx`, `UserAvatar.tsx` |
@@ -261,7 +290,7 @@ is not a precedent. Matching it is how the drift spread in the first place. Dire
 
 ## File organization
 
-**Top level of `src/` is by layer.** One lowercase directory per concern:
+**In TypeScript apps, top level of `src/` is by layer.** One lowercase directory per concern:
 
 ```
 src/
@@ -307,7 +336,7 @@ is a parse error and the whole file gets skipped. Reword instead, or quote the v
 
 ## Comments
 
-JSDoc and comment blocks. Documented code is core guideline 4, and this is the form it takes.
+Use the language's documentation conventions from core guideline 4.
 
 ## Error handling
 
@@ -323,12 +352,15 @@ recorded. Swallowing an error without a log is the thing to avoid.
 
 ## Formatting and lint
 
-**ESLint** for linting, **Prettier** for formatting. Their output is the answer. Don't
-hand-format around them, and don't argue with a rule in review when it can be configured
-instead.
+For TypeScript, **ESLint** for linting and **Prettier** for formatting. Their output is the
+answer. Don't hand-format around them, and don't argue with a rule in review when it can be
+configured instead.
 
 Run `eslint-config-prettier` so ESLint stops enforcing the stylistic rules Prettier owns.
 Without it the two fight over the same lines and every save flips the file back and forth.
+
+For Rust, use **rustfmt** through `cargo fmt` and **Clippy** through `cargo clippy`. For Python,
+run the repo's configured lint and format tools through uv.
 
 ---
 

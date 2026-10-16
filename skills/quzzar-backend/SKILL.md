@@ -1,6 +1,6 @@
 ---
 name: quzzar-backend
-description: Quzzar's backend conventions covering the two runtimes, the single write path, enforcing invariants in Postgres, shared schemas across runtimes, orchestration, secrets, and observability. Use before writing or changing any server-side code, API route, database query, migration, or edge function.
+description: Quzzar's backend conventions covering TypeScript, Python, and Rust toolchains, the single write path, enforcing invariants in Postgres, contracts across languages and runtimes, orchestration, secrets, and observability. Use before writing or changing any server-side code, API route, database query, migration, or edge function.
 ---
 
 # quzzar-backend
@@ -23,32 +23,53 @@ facts beat anything general below. If it has no `<!-- quzzar-skills:start -->` b
 
 ## Tool choices are already decided
 
-**Which** tool to use is fixed by the stack table in `quzzar-workplace`: bun, Temporal, Deno,
-Supabase, GitHub Actions, Langfuse, Zod, Playwright.
+Use the stack and language-selection guidance in `quzzar-workplace`. TypeScript with Bun,
+Python with uv, and Rust with Cargo are all standard choices within that guidance. Resolve
+routine language choices from the requirements and explain the concrete benefit.
 
 The list is closed. A second datastore or auth vendor is explicitly out; anything else outside
 the table is an `AskUserQuestion`, not a judgment call.
 
 ---
 
-## Two runtimes, and don't mix them up
+## Languages and runtimes
 
-- **bun**: runtime *and* package manager for service packages and the workspace root.
+- **Bun**: runtime *and* package manager for TypeScript services and JavaScript workspace tooling.
   **Never npm.**
-- **Deno**: the edge-function runtime. **Not bun.**
+- **Deno**: TypeScript where the host requires it, such as Supabase edge functions.
+- **Python + uv**: use `uv sync` for dependencies and `uv run` for commands.
+- **Rust + Cargo**: compile and run Rust services, workers, and libraries with Cargo.
 
 Check which context you're in before writing a runtime-specific import or a lockfile-touching
 command. Code written for one does not necessarily run on the other.
 
-## Shared schemas across runtimes
+## Rust backend work
 
-Every cross-boundary shape is a Zod schema in the shared schema package: wire shapes, intake,
-agent contracts, and form validation via the RHF resolver. **One schema, validated on both ends.**
+Apply `quzzar-workplace` language selection before choosing a language. For Rust components:
 
-Objects are **parsed** at the boundary, not cast (core guideline 4). Types are derived from
-schemas rather than declared alongside them.
+- Model valid states with structs and enums, and expected failures with `Result`. Propagate or
+  handle errors; reserve panics for broken internal invariants rather than ordinary failures.
+- Prefer safe Rust. Any `unsafe` needs a concrete necessity, documented safety invariants,
+  and focused review and tests.
+- Use the compiler and Clippy feedback while developing, then test behavior and failure paths.
+  Run `cargo fmt --check`, `cargo clippy`, and `cargo test` with the repo's workspace, target,
+  and feature settings. Benchmark the relevant workload when performance motivates the choice.
+- Choose a crate, binary, or service boundary that fits the existing system. Check deployment
+  and integration support before committing to it, and preserve the existing authorization,
+  database write path, API response shape, and observability.
 
-Two things bite when one package is consumed as source by both runtimes:
+## Shared contracts across languages and runtimes
+
+For TypeScript consumers, cross-boundary shapes are Zod schemas in the shared schema package:
+wire shapes, intake, agent contracts, and form validation via the RHF resolver. Objects are
+**parsed** at the boundary, not cast (core guideline 4). Types are derived from schemas.
+
+At a Rust or Python boundary, maintain one authoritative wire contract with native types and
+runtime validation in each consumer. Generate bindings where practical and cover compatibility
+with contract tests. Deserialization alone does not enforce business constraints. Preserve the
+same field names and `ApiResponse` serialization across languages.
+
+Two things bite when one TypeScript package is consumed as source by Bun and Deno:
 
 - **Relative imports need explicit `.ts` extensions**. Deno rejects extensionless imports, and
   every tsc consumer then needs `allowImportingTsExtensions`. Type-check against *both* runtimes
@@ -139,7 +160,8 @@ Never put PII, tokens, or full request payloads in a trace or a log. Logging is 
 
 ## Testing
 
-Playwright, end-to-end against a running app, per `quzzar-workplace`.
+Playwright for end-to-end tests against a running app, per `quzzar-workplace`. Rust logic also
+uses Cargo unit and integration tests; Python tests run through uv using the repo's test runner.
 
 Note the gap: an e2e-first tool only reaches backend surface exposed through a request path.
 Workflows, activities, and permission policies that no request touches need their own coverage.
@@ -150,10 +172,10 @@ The access test above is part of that answer.
 ## Rules
 
 - The stack list is closed. A second datastore or auth vendor is out.
-- **Never npm.** bun for service packages and the workspace root; Deno for edge functions.
+- Use the language and runtime guidance above for commands and dependency changes.
 - Reads via RLS, writes service-role only, through one path. Don't add a write policy.
 - Invariants belong in Postgres, not only in application code.
-- Every cross-boundary shape is a Zod schema, parsed at the boundary, shared by both ends.
+- Validate cross-boundary shapes against the shared contract in each language.
 - Every response is `ApiResponse<T, F>`. `fail` is the client's fault, `error` is ours.
 - Rotate any secret that gets pasted anywhere.
 - `CLAUDE.md` overrides this file. It holds the facts of the repo in front of you.
