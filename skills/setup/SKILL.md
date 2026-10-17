@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Set up a repo to use the quzzar skills. Surveys the existing stack and practices, writes the skill-routing block into CLAUDE.md, wires up .claude/launch.json so agents can run and see the app, installs Matt Pocock's skills, then reports where the codebase falls short of quzzar-workplace standards. Use when the user runs /setup or asks to set up the quzzar skills in a repo.
+description: Set up a repo to use the quzzar skills. Surveys the stack, writes skill routing and launch configuration, installs Impeccable with design checks and Matt Pocock's skills, then reports gaps against quzzar-workplace. Use when the user runs /setup or asks to set up the quzzar skills in a repo.
 ---
 
 # setup
@@ -23,12 +23,12 @@ configuring CI. This skill wires up the quzzar skills and nothing else.
 ## Step 1. Survey what's already here
 
 Read the repo before writing anything to it. You need this both for the CLAUDE.md block and
-for the gap report in Step 5.
+for the gap report in Step 6.
 
 **Read the `quzzar-workplace` skill first, and let its section list drive the survey.** Survey
 the dimensions it actually holds a standard on. If it has a rule about barrel files, look at
 whether the repo uses them; if it says nothing about them, don't spend the reading budget.
-That way Step 5's comparison lines up one-to-one instead of guessing which findings matter.
+That way Step 6's comparison lines up one-to-one instead of guessing which findings matter.
 
 **Tooling**, what the repo already uses:
 
@@ -112,9 +112,9 @@ Then, before writing code, read the skill for the layer you're touching:
 Read the layer skill *before* writing, not as a check afterwards. A change spanning both
 layers needs both.
 
-For visual work, also read **`quzzar-design`**: the visual plan that comes before the code,
-and the render-screenshot-critique loop. Never report a visual change as done without having
-looked at it rendered.
+For visual work, also read **`quzzar-design`** and the installed **`impeccable`** skill.
+Follow their reference research, design, critique, refinement, and detector workflow.
+Never report a visual change as done without having looked at it rendered.
 
 ### Stack
 
@@ -186,7 +186,59 @@ Two things to get right:
 Add `.claude/launch.json` to the repo rather than to `.gitignore`. The point is that every
 future session on any machine gets the same loop.
 
-## Step 4. Install Matt Pocock's skills
+## Step 4. Install and initialize Impeccable
+
+Impeccable is part of the standard toolkit. Use its official installer so the tool-specific
+skill, reference playbooks, scripts, engine, and supported design hooks arrive together.
+It is agent tooling, not a frontend runtime dependency.
+
+Inspect existing project and global installations first. Reuse their intended scope; for a
+new installation, use project scope. Choose providers from the tools the user actually uses,
+not every tool detected on the machine. For Claude Code:
+
+```bash
+bunx impeccable install -y --providers=claude --scope=project
+```
+
+For Codex, use `--providers=codex`; for a repo using both, use `--providers=claude,codex`.
+`bunx` runs the official `impeccable` package (the upstream docs spell the runner `npx`).
+Check the current CLI help before using flags. Re-running the installer refreshes copied
+installs and adds missing selected providers. Keep an existing marketplace or linked install
+on its own update path instead of layering another copy over it. Preserve existing hook
+entries, local configuration, and intentional detector exceptions; diagnose conflicts before
+using `--force`.
+
+Read the installed `impeccable/SKILL.md` and the relevant playbooks to finish setup even if
+the session has not discovered the new skill yet. Agent-chat commands use `/impeccable` in
+Claude Code and `$impeccable` in Codex; they are not shell subcommands. In particular:
+
+- Check `impeccable hooks status` and enable design checks with `impeccable hooks on`,
+  unless the user has explicitly disabled them. Preserve that decision and report it.
+- Run `impeccable doctor` to verify the installed context and hook paths. Distinguish a
+  written hook manifest from a trusted, running hook. If the coding tool requires the human
+  to review hooks, report that exact remaining action; never mark trust as complete yourself.
+- For a frontend, use `impeccable init` to record known audience, tasks, and constraints in
+  `PRODUCT.md`. Reuse existing context and ask only for consequential missing facts. For an
+  established visual system, use `impeccable document` to capture it in `DESIGN.md` and its
+  structured sidecar, preserving deliberate design choices. Skip design capture for an
+  unstyled scaffold and product design initialization for a service-only repo.
+- Check whether the current agent has an actual image-generation tool. Prefer the built-in
+  tool for mockups and assets; setup needs no image render, API key, or paid test request.
+  Record availability accurately. Let the design task choose whether to start with mockups.
+
+For an existing web frontend, run `bunx impeccable detect` on its actual UI source directory
+and include the findings in Step 6. An empty scaffold or service-only repo has no UI to scan.
+Report installation or scan failures explicitly, along with anything still unverified.
+Setup reports design findings; it does not redesign the app.
+
+Confirm the installed skill and referenced resources exist, the launcher runs, and hook
+status/doctor match the chosen scope. Tell the user to reload the coding tool to discover new
+skills. Installation is incomplete if files or checks failed; a reload does not repair them.
+The maintained installation and hook details are in the [official getting-started
+guide](https://impeccable.style/tutorials/getting-started/) and
+[automatic check guide](https://impeccable.style/docs/hooks/).
+
+## Step 5. Install Matt Pocock's skills
 
 They're part of the standard toolkit for a quzzar repo: TDD, code review, diagnosing bugs,
 domain modeling, and the rest. Install them so they're available alongside the quzzar skills.
@@ -211,7 +263,7 @@ claude plugin update mattpocock-skills
 
 **A plugin install or update needs a session restart to take effect.** His skills won't be
 available for the rest of this session, so don't attempt to use one. Tell the user to restart
-and note that the toolkit lands then. Step 5 doesn't depend on them, so setup still finishes
+and note that the toolkit lands then. Step 6 doesn't depend on them, so setup still finishes
 in full.
 
 Worth mentioning in your final report: `/setup-matt-pocock-skills` configures the issue
@@ -220,7 +272,7 @@ recommend it as a next step rather than trying to run it.
 
 ---
 
-## Step 5. Report where the codebase falls short
+## Step 6. Report where the codebase falls short
 
 Now compare the Step 1 survey against the standard, and report the gaps. You do this
 yourself, and nothing here is handed off.
