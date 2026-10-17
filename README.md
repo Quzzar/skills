@@ -65,6 +65,18 @@ and deselecting rewrites the list.
 | [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | UI architecture and conventions, with Mobbin research and Impeccable design and quality checks for visual work. |
 | [`quzzar-design`](skills/quzzar-design/SKILL.md) | Distinctive UI through product and website references, Impeccable design and refinement, AI-pattern detection, and the render-screenshot-critique loop. |
 | [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | Backend language toolchains, Rust implementation and checks, shared contracts across languages and runtimes, the single write path, invariants in Postgres, orchestration, secrets, deploys, observability. |
+| [`animation-principles`](skills/animation-principles/SKILL.md) | Timing, easing, weight, anticipation, follow-through, and natural movement across tools. |
+| [`color-motion`](skills/color-motion/SKILL.md) | Palettes, perceptual color interpolation, grading, and render color management. |
+| [`shot-composition`](skills/shot-composition/SKILL.md) | Focal hierarchy, grids, safe areas, depth, and camera framing. |
+| [`motion-art-direction`](skills/motion-art-direction/SKILL.md) | Motion language, tone, pacing, hierarchy, restraint, and shot consistency. |
+| [`after-effects`](skills/after-effects/SKILL.md) | After Effects expressions, rigging, automation, and export. |
+| [`beat-sync-editing`](skills/beat-sync-editing/SKILL.md) | Editing rhythm, beat-aligned cuts, transitions, and retiming. |
+| [`remotion-video`](skills/remotion-video/SKILL.md) | Frame-based React video compositions and MP4/GIF rendering. |
+| [`logo-animation`](skills/logo-animation/SKILL.md) | Logo reveals, stingers, splash screens, and loaders. |
+| [`motion-background`](skills/motion-background/SKILL.md) | Subtle loops, gradients, shader backgrounds, and particles. |
+
+The nine motion skills are vendored from [iart.ai](https://github.com/iart-ai/motion-design-skills).
+See [motion skill maintenance](docs/motion-skills.md) for source revision, licensing, and updates.
 
 ### How they get invoked
 
@@ -133,7 +145,7 @@ project skill, not here.
 
 ## Also installable as a Claude Code plugin
 
-Claude-only by construction, versioned, and all five skills come as one unit:
+Claude-only by construction, versioned, and all fourteen skills come as one unit:
 
 ```bash
 claude plugin marketplace add Quzzar/skills

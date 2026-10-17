@@ -14,6 +14,15 @@ whether the result is any good.
 and the required review and detector checks. Setup installs it; the workflow here makes it
 part of everyday design work.
 
+## Animation and motion direction
+
+For animation work, read the installed `motion-art-direction`, `animation-principles`, and
+`shot-composition` skills before implementation. Use `color-motion` for palette and color
+transitions. Select `motion-background`, `logo-animation`, or `beat-sync-editing` for those
+specific tasks; read `after-effects` or `remotion-video` only when the project uses that engine.
+These nine skills ship with Quzzar. Their principles do not require changing the project's
+animation stack. Match motion to the brief and verify the rendered sequence over time.
+
 ## When to use
 
 - Building a new surface, page, or component that someone will look at.

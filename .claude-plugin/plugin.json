@@ -1,6 +1,6 @@
 {
   "name": "quzzar-skills",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Quzzar's agent skills.",
   "author": {
     "name": "Quzzar",
@@ -17,6 +17,15 @@
     "./skills/quzzar-workplace",
     "./skills/quzzar-frontend",
     "./skills/quzzar-design",
-    "./skills/quzzar-backend"
+    "./skills/quzzar-backend",
+    "./skills/after-effects",
+    "./skills/animation-principles",
+    "./skills/beat-sync-editing",
+    "./skills/color-motion",
+    "./skills/logo-animation",
+    "./skills/motion-art-direction",
+    "./skills/motion-background",
+    "./skills/remotion-video",
+    "./skills/shot-composition"
   ]
 }
