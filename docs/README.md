@@ -9,3 +9,5 @@ This repo's brain: one markdown file per topic, indexed here. The convention its
 Installing the skills, what each CLI flag is for, and where the files actually land are in the
 [root README](../README.md). That's the surface for people *installing* these skills; `docs/`
 is for people *changing* them.
+
+- [motion-skills.md](motion-skills.md) covers the vendored motion collection, source revision, licensing, and updates.

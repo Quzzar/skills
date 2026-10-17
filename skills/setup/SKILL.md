@@ -116,6 +116,9 @@ For visual work, also read **`quzzar-design`** and the installed **`impeccable`*
 Follow their reference research, design, critique, refinement, and detector workflow.
 Never report a visual change as done without having looked at it rendered.
 
+For animation work, read `motion-art-direction`, `animation-principles`, and
+`shot-composition`; select other installed motion skills to fit the task and existing engine.
+
 ### Stack
 
 <!-- filled in by /setup from the repo itself. Correct it by hand if it drifts -->
@@ -237,6 +240,15 @@ skills. Installation is incomplete if files or checks failed; a reload does not 
 The maintained installation and hook details are in the [official getting-started
 guide](https://impeccable.style/tutorials/getting-started/) and
 [automatic check guide](https://impeccable.style/docs/hooks/).
+
+## Motion skill availability
+
+The Quzzar collection includes nine motion-design skills. Verify they are installed alongside
+the core conventions. If a previous selective install omitted them, install the missing skills
+from `Quzzar/skills` using the existing project/global scope and selected agents. Use
+`--skill animation-principles color-motion shot-composition motion-art-direction after-effects
+beat-sync-editing remotion-video logo-animation motion-background` with the skills CLI.
+Do not install rendering engines or runtime packages merely because a skill mentions them.
 
 ## Step 5. Install Matt Pocock's skills
 
