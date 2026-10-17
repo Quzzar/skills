@@ -60,10 +60,10 @@ and deselecting rewrites the list.
 
 | Skill | What it does |
 | --- | --- |
-| [`setup`](skills/setup/SKILL.md) | Run once per repo. Surveys the stack and existing practices, writes the skill-routing block into `CLAUDE.md`, installs Matt Pocock's skills, and reports where the code falls short of `quzzar-workplace`. |
+| [`setup`](skills/setup/SKILL.md) | Run once per repo. Surveys the stack, writes skill routing and launch configuration, installs Impeccable with design checks and Matt Pocock's skills, and reports gaps. |
 | [`quzzar-workplace`](skills/quzzar-workplace/SKILL.md) | The five core guidelines, language selection (TypeScript with Bun, Python with uv, Rust with Cargo), the canonical tool stack, the top-level `docs/` knowledge tree, and repo-wide code rules. Read before any work. |
-| [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | The layer boundary, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, the component gallery. |
-| [`quzzar-design`](skills/quzzar-design/SKILL.md) | Visual quality. The plan that precedes the code, the AI-default aesthetics to avoid, and the render-screenshot-critique loop that stops an agent shipping a layout it never looked at. |
+| [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | UI architecture and conventions, with Mobbin research and Impeccable design and quality checks for visual work. |
+| [`quzzar-design`](skills/quzzar-design/SKILL.md) | Distinctive UI through product and website references, Impeccable design and refinement, AI-pattern detection, and the render-screenshot-critique loop. |
 | [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | Backend language toolchains, Rust implementation and checks, shared contracts across languages and runtimes, the single write path, invariants in Postgres, orchestration, secrets, deploys, observability. |
 
 ### How they get invoked
@@ -83,6 +83,29 @@ what port. That's what lets a later session actually render the UI it just wrote
 guessing at it, which is the loop `quzzar-design` is built around.
 
 **Run `setup` first in a new repo.** The others assume its block exists.
+
+### Impeccable and visual research
+
+Setup installs the full official [Impeccable](https://impeccable.style/) build for the coding
+tools used in the repo, including its playbooks, scripts, and supported design hooks. It
+checks the installation and hook status, initializes product context for frontend work, and
+documents an existing visual system. The report identifies any reload or human hook-trust
+action still needed. Re-running setup preserves existing configuration and installation scope.
+
+Visual work uses Mobbin to study interaction patterns and broader website references to
+explore composition and identity. Impeccable then guides design, critique, focused refinement,
+polish, and audit. Source and rendered detector scans catch known AI patterns and quality
+issues; screenshots and interaction checks verify the actual result. The
+[visual workflow](skills/quzzar-design/references/impeccable.md) defines these checks.
+
+Requests for multiple versions use Impeccable's variation workflows to explore the requested
+number of distinct directions, then critique and polish each. Existing-element variants can
+be compared live with `generate`; new page identities use the new-design workflow.
+
+Impeccable is agent tooling and adds no runtime dependency to the app. Its commands use
+`/impeccable` in Claude Code and `$impeccable` in Codex. Setup uses Bun's `bunx` runner for
+the official package; the [upstream installation
+guide](https://impeccable.style/tutorials/getting-started/) uses `npx`.
 
 ## Scope
 

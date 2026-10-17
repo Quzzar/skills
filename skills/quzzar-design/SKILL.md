@@ -1,6 +1,6 @@
 ---
 name: quzzar-design
-description: How to make a UI actually look good, and how to see what you built. Covers the visual plan that precedes the code, the AI-default aesthetics to avoid, the render-screenshot-critique loop, and the rubric to critique against. Use when building a new surface, restyling an existing one, doing a design or polish pass, or when the user says something looks generic, cluttered, unfinished, or just wrong.
+description: Design and verify distinctive UI using Mobbin and website references, Impeccable playbooks and AI-pattern detection, and a render-screenshot-critique loop. Use when building a new surface, restyling, polishing, or when a UI looks generic, cluttered, unfinished, or wrong.
 ---
 
 # quzzar-design
@@ -8,6 +8,11 @@ description: How to make a UI actually look good, and how to see what you built.
 Visual quality, and the loop that verifies it. The conventions for *how* to write UI code
 (layers, structure, state, tokens) are in `quzzar-frontend`. Read that too. This file is about
 whether the result is any good.
+
+**Use Impeccable throughout visual work.** Read the installed `impeccable` skill and
+[references/impeccable.md](references/impeccable.md) for command selection, image generation,
+and the required review and detector checks. Setup installs it; the workflow here makes it
+part of everyday design work.
 
 ## When to use
 
@@ -53,16 +58,50 @@ If the brief does not pin down what this surface is, pin it yourself before desi
 one concrete job the surface does, who is looking at it, and what the single most important
 element on it is. State your answer in one line and move on.
 
-Pinning the *subject* yourself is right, and stalling to ask about it wastes everyone's time. A
-genuinely open *visual direction* is a different case: that is the specific call you are worst
-at making alone, so offer two or three differentiated directions in a line each rather than
-silently picking one and building it out.
+Pinning the *subject* yourself is right, and stalling to ask about it wastes everyone's time.
+When the user asks for multiple versions or ideas, that authorizes exploration: produce the
+requested number of distinct directions using the [variation workflow](references/impeccable.md#explore-multiple-directions).
+If the task instead needs one final surface and its visual direction is genuinely open, offer
+two or three differentiated directions before committing to one.
 
 Distinctive choices come from the subject's own world: its vocabulary, its artifacts, the shape
 of its data. Generic choices come from designing for "a page". Build with the real content, not
 lorem ipsum, because placeholder copy hides every density and overflow problem you have.
 
 ## Step 2. Write the plan before you write code
+
+### Reference pass: interaction and visual range
+
+For a new surface or material redesign, inspect real products solving the interaction problem
+through Mobbin. Search the concrete journey, screen, or section:
+
+- `mcp__mobbin__search_flows` for multi-step journeys;
+- `mcp__mobbin__search_screens` for application screens and states;
+- `mcp__mobbin__search_sections` for website sections.
+
+Start with three to five relevant results on the target platform. Examine the returned images.
+Carry forward observations about hierarchy, density, control placement, or sequencing, plus
+choices that do not fit the product. Cite the returned `mobbin_url` when showing a reference;
+expiring `image_url` values are not durable citations.
+
+Broaden the visual research beyond familiar software. Inspect a few live sites or full-page
+captures with contrasting compositions, typography, imagery, and rhythm. Include at least one
+reference outside the product's category when exploring a new identity. The
+[Impeccable gallery](https://impeccable.style/gallery/) is a useful starting point: compare the
+observability, vintage motorcycle, and perpetual exchange examples, then follow the websites
+to see how the design works beyond a thumbnail. Use references relevant to this brief; those
+examples are not a mandatory style for every project.
+
+Extract principles, not a collage of other brands. Keep useful interaction conventions while
+developing a visual identity from this product's subject, content, and audience. A familiar
+workflow can still have distinctive composition and imagery. For a narrow polish pass, use
+the established design system and research only the unresolved decision. If reference tools
+are unavailable, state what could not be inspected; never invent observations.
+
+### Shape the direction
+
+Use Impeccable's new-design workflow for a new surface or redesign, or `shape` when the outcome
+is a plan. For refinement, use the focused playbook selected in the linked workflow.
 
 A compact plan, four parts. Do this in thinking, not in chat, unless the user asked to see
 options.
@@ -218,6 +257,11 @@ than critique that just names a category.
 
 ### Fix, then re-capture
 
+Apply Impeccable's `critique` to the rendered surface and turn the findings into focused
+improvements. Finish with `polish`, `audit`, and source plus rendered detector scans as
+described in [references/impeccable.md](references/impeccable.md). A clean scan covers known
+patterns; the rubric above still judges the composition and usefulness.
+
 A change is not verified until you have looked at the result of the change. Two or three rounds
 is normal, and the second round is usually where the real problem surfaces, because the first
 round fixes what was merely broken.
@@ -274,8 +318,8 @@ the session. The next pass reads it before Step 2 and starts somewhere genuinely
 - Capture at two widths and in both themes, with real content and the real states.
 - Critique against the rubric, not from memory. Re-capture rather than re-reason.
 - Measure before arguing: `getComputedStyle` and `getBoundingClientRect` settle it.
-- Which of two designs is better is a question for the user, not for you. Same for a genuinely
-  open visual direction: offer two or three, don't silently pick one.
+- Let the user choose among competing visual directions. When asked for alternatives, deliver
+  the requested count and fidelity; use Impeccable to distinguish and refine every candidate.
 - Couldn't reach the surface to verify it? Say so. Never let a skipped capture pass as done.
 - Record rejected directions in `docs/`, or the next session re-proposes them.
 - Tokens, not raw values (`quzzar-frontend`).

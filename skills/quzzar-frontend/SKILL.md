@@ -1,6 +1,6 @@
 ---
 name: quzzar-frontend
-description: Quzzar's frontend conventions covering the layer boundary between shared UI and app code, component structure, styling and tokens, state, forms, animation, accessibility, UI copy, and the component gallery. Use before writing or changing any UI code, React components, styles, or client-side state.
+description: Quzzar's frontend conventions covering UI architecture, tokens, state, forms, accessibility, and the component gallery, with Mobbin reference research and Impeccable design and quality checks for visual work. Use before writing or changing any UI code, React components, styles, or client-side state.
 ---
 
 # quzzar-frontend
@@ -11,6 +11,21 @@ live in `quzzar-workplace`. Read that too.
 This file covers **how to write** UI code. Whether the result actually looks good, and how to
 render and critique it instead of guessing, is `quzzar-design`. Read that as well for anything
 where "does it look right" is the real acceptance criterion.
+
+## Design tools are part of the workflow
+
+For every visual UI change, read the installed `impeccable` skill and follow
+`quzzar-design`'s [Impeccable workflow](../quzzar-design/references/impeccable.md).
+Use its relevant playbooks during the work and complete critique, polish, audit, and detector
+checks before reporting the result. Scale each pass to the changed surface. These are agent
+skills and tools; they do not change the runtime stack below.
+
+For a new surface or material redesign, first complete `quzzar-design`'s reference pass:
+Mobbin for interaction precedent, plus distinctive websites for visual range. Purely
+behavioral changes do not need a visual design pass.
+
+When asked for multiple versions, follow the linked variation workflow to produce the
+requested count of distinct directions and refine each with Impeccable before comparison.
 
 ## When to use
 
