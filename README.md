@@ -65,6 +65,7 @@ and deselecting rewrites the list.
 | [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | UI architecture and conventions, with Mobbin research and Impeccable design and quality checks for visual work. |
 | [`quzzar-design`](skills/quzzar-design/SKILL.md) | Distinctive UI through product and website references, Impeccable design and refinement, AI-pattern detection, and the render-screenshot-critique loop. |
 | [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | Backend language toolchains, Rust implementation and checks, shared contracts across languages and runtimes, the single write path, invariants in Postgres, orchestration, secrets, deploys, observability. |
+| [`illustrated-svg`](skills/illustrated-svg/SKILL.md) | Cohesive generated illustration sets, transparent asset extraction, vector reconstruction, and source/render verification. Includes a tracing helper and distinguishes editable vectors from articulated animation rigs. |
 | [`animation-principles`](skills/animation-principles/SKILL.md) | Timing, easing, weight, anticipation, follow-through, and natural movement across tools. |
 | [`color-motion`](skills/color-motion/SKILL.md) | Palettes, perceptual color interpolation, grading, and render color management. |
 | [`shot-composition`](skills/shot-composition/SKILL.md) | Focal hierarchy, grids, safe areas, depth, and camera framing. |
@@ -145,7 +146,7 @@ project skill, not here.
 
 ## Also installable as a Claude Code plugin
 
-Claude-only by construction, versioned, and all fourteen skills come as one unit:
+Claude-only by construction, versioned, and all fifteen skills come as one unit:
 
 ```bash
 claude plugin marketplace add Quzzar/skills
