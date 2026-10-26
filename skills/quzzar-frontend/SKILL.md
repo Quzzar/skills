@@ -16,12 +16,14 @@ where "does it look right" is the real acceptance criterion.
 
 For every visual UI change, read the installed `impeccable` skill and follow
 `quzzar-design`'s [Impeccable workflow](../quzzar-design/references/impeccable.md).
-Use its relevant playbooks during the work and complete critique, polish, audit, and detector
-checks before reporting the result. Scale each pass to the changed surface. These are agent
+Execute the playbook appropriate to the task, including context loading, craft-floor guidance,
+required review artifacts, and detector directives. Verify the changed surface rendered and
+record concrete findings and fixes before reporting the result. These are agent
 skills and tools; they do not change the runtime stack below.
 
-For a new surface or material redesign, first complete `quzzar-design`'s reference pass:
-Mobbin for interaction precedent, plus distinctive websites for visual range. Purely
+For a new surface or materially changed journey, first complete `quzzar-design`'s Mobbin
+flow research and source-linked visual report, including the proposed flow's deliberate
+deviations. Use website references when visual identity or composition is open. Purely
 behavioral changes do not need a visual design pass.
 
 When asked for multiple versions, follow the linked variation workflow to produce the

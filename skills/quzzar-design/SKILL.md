@@ -1,6 +1,6 @@
 ---
 name: quzzar-design
-description: Design and verify distinctive UI using Mobbin and website references, Impeccable playbooks and AI-pattern detection, and a render-screenshot-critique loop. Use when building a new surface, restyling, polishing, or when a UI looks generic, cluttered, unfinished, or wrong.
+description: Design and verify UI using comparative Mobbin flow research, source-linked visual reports, installed Impeccable workflows, and rendered verification. Use when building a new surface, changing a user journey, restyling, polishing, or investigating confusing or unfinished UI.
 ---
 
 # quzzar-design
@@ -81,17 +81,12 @@ lorem ipsum, because placeholder copy hides every density and overflow problem y
 
 ### Reference pass: interaction and visual range
 
-For a new surface or material redesign, inspect real products solving the interaction problem
-through Mobbin. Search the concrete journey, screen, or section:
-
-- `mcp__mobbin__search_flows` for multi-step journeys;
-- `mcp__mobbin__search_screens` for application screens and states;
-- `mcp__mobbin__search_sections` for website sections.
-
-Start with three to five relevant results on the target platform. Examine the returned images.
-Carry forward observations about hierarchy, density, control placement, or sequencing, plus
-choices that do not fit the product. Cite the returned `mobbin_url` when showing a reference;
-expiring `image_url` values are not durable citations.
+Before designing a new or materially changed journey, complete
+[references/mobbin.md](references/mobbin.md): inspect comparable complete flows, produce an
+annotated visual report, and map the proposed journey to the observed patterns and deliberate
+deviations. Research precedes composition and code. Screen references alone do not satisfy
+flow research. For a component or narrow polish task, inspect only the unresolved pattern;
+reuse relevant existing research when it still matches the task.
 
 Broaden the visual research beyond familiar software. Inspect a few live sites or full-page
 captures with contrasting compositions, typography, imagery, and rhythm. Include at least one
@@ -112,8 +107,9 @@ are unavailable, state what could not be inspected; never invent observations.
 Use Impeccable's new-design workflow for a new surface or redesign, or `shape` when the outcome
 is a plan. For refinement, use the focused playbook selected in the linked workflow.
 
-A compact plan, four parts. Do this in thinking, not in chat, unless the user asked to see
-options.
+A compact visual plan follows the flow report. It supplements the installed Impeccable
+workflow; it does not replace its context, direction contract, or review artifacts. Keep
+planning brief for a narrow edit; retain consequential decisions in the existing surface brief.
 
 **Color.** 4 to 6 named values. In a repo with a token system these are already decided, so
 your job is different: state which tokens this surface uses and what each one is *for*. A
@@ -309,15 +305,18 @@ You start each session with no memory of what you already tried, which is why th
 direction resurfaces across three separate attempts at one surface. A human designer doesn't
 re-pitch the idea that lost last week.
 
-So when a pass rejects a direction, record what was tried and why it lost. Two lines per
-direction is enough. Per `quzzar-workplace` that belongs in `docs/` as a topic file, because it
-is exactly the kind of knowledge that exists nowhere in the source and would otherwise die with
-the session. The next pass reads it before Step 2 and starts somewhere genuinely new.
+Keep source-linked research, adopted patterns, deviations, and rejected directions in the
+existing feature design record or Impeccable surface brief. Two lines can explain why a
+direction lost. Do not create competing records of the same decision. Keep temporary reports
+and captures in the repo's ignored review-artifact location; retain durable findings in its
+maintained documentation. The next pass reads that record before designing again.
 
 ---
 
 ## Rules
 
+- Research journeys as flows, then compare the proposed flow with the references before code.
+- Use the installed Impeccable playbook and its artifacts; listing command names is not execution.
 - Plan before code. Color, type, layout, signature, then a pass that removes the defaults.
 - Name what you are avoiding. A design that cannot say what it rejected is the mean.
 - One signature element. Everything else stays quiet.

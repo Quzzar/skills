@@ -6,16 +6,28 @@ instructions or invoke every command on every edit.
 
 ## Start with context
 
-Read the repo's product context, design decisions, and rejected directions. Follow the
-installed skill's context-loading step. `PRODUCT.md` holds audience, tasks, and constraints;
-`DESIGN.md` and `.impeccable/design.json` capture the visual system. Reuse them rather than
-asking the same discovery questions each session. If Impeccable is missing, follow setup's
-installation step. A failed installation or launcher is an explicit incomplete check.
+Read the installed skill's setup and routing before choosing a playbook. Run its bundled
+`impeccable context` launcher once per session for the affected app, from the project cwd
+specified by that installation; use `impeccable.cmd` on Windows when `sh` is unavailable.
+Resolve a named target before invoking it. In a monorepo, honor target-selection output and
+load the affected workspace instead of treating a root-level report as app context. Ask only
+when the task and repo evidence do not identify the app. Follow any required target retry.
+
+Read the repo's product context, design decisions, and rejected directions. `PRODUCT.md`
+holds audience, tasks, and constraints; `DESIGN.md` and `.impeccable/design.json` capture
+the visual system. Reuse them rather than
+asking the same discovery questions each session. Preserve the installed playbooks as upstream
+files; fix Quzzar's integration here rather than patching a vendor skill that an update replaces.
+If Impeccable is missing, follow setup's installation step. On launcher failure, make the
+installed skill's required disclosure, read existing context directly, and continue permitted
+work without pretending context loaded. Do not run init, document, or doctor repairs as an
+unrelated side effect. Use their playbooks when the task requires or authorizes that work.
 
 Commands below are agent-chat operations: `/impeccable <command> <target>` in Claude Code,
 `$impeccable <command> <target>` in Codex. Read the corresponding installed playbook and carry
 out its steps through the tools available in the session. Typing a command name in a report
-does not run a review. `bunx impeccable detect`, shown below, is a terminal command.
+does not run a review. The bundled launcher's helper subcommands are terminal operations;
+use only those documented by the installed playbook.
 
 ## Design and refine
 
@@ -29,7 +41,7 @@ does not run a review. `bunx impeccable detect`, shown below, is a terminal comm
 | Bland composition with room for expression | `bolder`; `delight` for a meaningful signature moment |
 | Unclear labels or instructions | `clarify` |
 | Responsive layout or difficult states | `adapt` or `harden` |
-| Before finishing a visual change | `polish` for craft, then `audit` for implementation quality |
+| Finishing a feature or substantial visual change | `polish` for craft and `audit` for implementation quality |
 
 These commands are tools for the current problem, not a checklist of effects to add. A task
 interface earns distinction through hierarchy, density, and precise feedback; a marketing
@@ -37,9 +49,21 @@ page can give more space to expressive imagery and composition. Keep established
 identity during refinement. Respect the repo's tokens, accessible primitives, architecture,
 and existing behavior when applying upstream suggestions.
 
-For every visual change, use critique, polish, and audit on the affected surface, scaled to
-the scope of the edit. Fix actionable findings in scope and repeat the affected checks after
-changes. Do not turn a small component edit into an unsolicited site redesign.
+Read and execute the selected playbook, including its prerequisites, helper scripts,
+persistence, isolation/delegation when required and available, and completion conditions.
+Before any UI edit, load its craft-floor reference. New-work, local refinement, shape,
+critique, and audit have different contracts: shape returns a brief; critique and audit
+report findings rather than silently implementing every suggestion. An authorized build or
+fix task can act on in-scope findings without asking again. Existing user instructions and
+authorization take precedence over redundant confirmations in a playbook.
+
+Do not flatten every task into a mandatory critique/polish/audit chain. Use the installed
+workflow's review requirements for builds and substantive changes, the requested diagnostic
+for review-only work, and a focused refinement plus rendered verification for a narrow fix.
+Follow the selected playbook's detector rules even when they differ from context's general
+guidance. If an isolated review is required, run it when tools and governing instructions
+allow; otherwise disclose the degraded run as that playbook requires. Never report an
+inline self-review as an independent assessment.
 
 ## Explore multiple directions
 
@@ -51,8 +75,8 @@ brief to choose useful directions autonomously when the user has invited explora
 - **For variants of an existing element**, use Impeccable `generate` with the requested count,
   a suitable action, and the named target. For example, `/impeccable generate 8 polish the
   pricing cards` in Claude Code, or `$impeccable generate 8 polish the pricing cards` in Codex.
-  The current live workflow supports up to eight variants in one round; check the installed
-  playbook for limits and group larger requests without reducing the total.
+  Check the installed playbook for current limits and group larger requests without reducing
+  the requested total.
 - **For whole-page concepts or new identities**, use the new-design/shape workflow to develop
   the requested directions. Give each a clear premise grounded in the subject, a composition,
   typographic character, imagery approach, and signature. An exploration of a new identity
@@ -92,22 +116,22 @@ guide](https://impeccable.style/docs/image-generation/) for current setup detail
 
 ## Detect AI patterns and verify the result
 
-Keep supported design hooks active during UI edits unless the user has disabled them. Check
-their status when feedback appears absent or setup changed; silence does not prove a clean
-scan. Hooks provide early feedback; finish a visual change with an explicit detector pass:
+Respect the user's hook settings. Check hook status through the installed hooks playbook
+when feedback appears absent or setup changed. A manifest or enabled setting does not prove
+the host trusted and executed the hook; silence does not prove a clean scan.
 
-```bash
-bunx impeccable detect path/to/changed-ui.tsx path/to/changed-styles.css.ts
-bunx impeccable detect http://localhost:5173/changed-route
-bunx impeccable detect --viewport 390x844 http://localhost:5173/changed-route
-```
+Follow `context`, the active playbook, and hook directives for detector ownership. In the
+current installation, automatic hooks cover ordinary edits; without an active detector,
+`MANUAL_DETECTOR_REQUIRED` requests one completion scan. A selected critique playbook can
+require its own detector assessment. Do not append redundant source and URL scans to every
+workflow. Use the bundled launcher and installed detector reference for supported syntax;
+do not fetch a different CLI version with `bunx` during routine work.
 
-Replace example paths, port, and route with the actual files and running surface. For a
+When a rendered detector check is required, confirm it reached the actual surface. For a
 shared component use its gallery route. For an authenticated route, use supported session
-access and confirm the detector reached the intended screen, not the login page. If it
-cannot, report the rendered scan as incomplete and still use the authenticated screenshot
-loop to inspect the UI. Scan the changed files for a focused edit; scan the UI source
-directory for a broader design pass. Source checks and browser checks cover different issues.
+access and verify the intended screen rather than a login page. If unavailable, report that
+check as incomplete and use the authenticated screenshot loop where possible. Source scans
+cannot substitute for browser inspection.
 
 Read the findings and advisories. Exit `0` means no primary findings, `2` means primary
 findings, and `1` means a scan failed, including a partial scan. Fix relevant faults or record
@@ -120,7 +144,21 @@ could belong to any product. Detection finds known patterns; it cannot certify o
 usability, or accessibility. Trigger real states, use keyboard focus, check both themes when
 supported, and re-capture after the final changes.
 
-Report which surface was reviewed, what changed after critique, scan results, and any
-unverified state. A visual task is complete when the changed surface has been seen rendered,
-the required reviews and scans have run, and findings are resolved or explicitly accounted
-for. See the [detector guide](https://impeccable.style/docs/detector/) for current scan options.
+## Evidence that the tools were used
+
+Keep a compact execution record in the existing surface brief, feature record, or review
+artifact: target/workspace; actual Mobbin flow/report sources when research is needed;
+Impeccable playbooks read and helper commands executed; concrete findings and resulting
+changes; rendered evidence; detector coverage; unresolved findings and access limitations.
+Reuse upstream-generated artifacts and link them rather than duplicating their contents.
+Do not claim a playbook ran because its name appears in a plan, a scan passed because a hook
+was configured, or a flow was inspected because a search returned its title.
+
+A visual task is complete when its scoped workflow has run, changed surfaces and journeys
+have been inspected rendered, and findings are resolved or explicitly accounted for. Report
+the material result and verification limits concisely. For review-only tasks, deliver the
+requested assessment and preserve its no-edit scope.
+
+Maintained sources: the installed playbooks, [workflow guide](https://impeccable.style/docs/),
+[design-system guide](https://impeccable.style/docs/design-system/), and
+[automatic checks](https://impeccable.style/docs/hooks/).

@@ -113,7 +113,10 @@ Read the layer skill *before* writing, not as a check afterwards. A change spann
 layers needs both.
 
 For visual work, also read **`quzzar-design`** and the installed **`impeccable`** skill.
-Follow their reference research, design, critique, refinement, and detector workflow.
+For new or materially changed journeys, require Mobbin flow comparisons and a source-linked
+visual report before implementation. Execute the installed Impeccable playbook for the task,
+including context loading, review artifacts, and detector directives; naming a command is
+not execution. Keep the repo's established components and tokens.
 Never report a visual change as done without having looked at it rendered.
 
 For animation work, read `motion-art-direction`, `animation-principles`, and
@@ -237,6 +240,11 @@ Setup reports design findings; it does not redesign the app.
 Confirm the installed skill and referenced resources exist, the launcher runs, and hook
 status/doctor match the chosen scope. Tell the user to reload the coding tool to discover new
 skills. Installation is incomplete if files or checks failed; a reload does not repair them.
+Also verify that the running agent's discovered Quzzar skill paths resolve to the intended
+entrypoints and references. A successful refresh in `~/.agents/skills` does not update an
+independent stale copy under `~/.codex/skills` or another provider directory. Compare active
+files with the intended source, preserve documented local adaptations, and report unresolved
+shadowing. Check referenced Mobbin and Impeccable workflow resources, not just SKILL.md.
 The maintained installation and hook details are in the [official getting-started
 guide](https://impeccable.style/tutorials/getting-started/) and
 [automatic check guide](https://impeccable.style/docs/hooks/).
