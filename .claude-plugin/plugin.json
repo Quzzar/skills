@@ -1,6 +1,6 @@
 {
   "name": "quzzar-skills",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Quzzar's agent skills.",
   "author": {
     "name": "Quzzar",
@@ -13,10 +13,9 @@
     "engineering"
   ],
   "skills": [
-    "./skills/setup",
     "./skills/quzzar-workplace",
     "./skills/quzzar-frontend",
-    "./skills/quzzar-design",
+    "./skills/quzzar-ui-ux-design",
     "./skills/quzzar-backend",
     "./skills/quzzar-system-design",
     "./skills/illustrated-svg",
@@ -28,6 +27,7 @@
     "./skills/motion-art-direction",
     "./skills/motion-background",
     "./skills/remotion-video",
-    "./skills/shot-composition"
+    "./skills/shot-composition",
+    "./skills/rust-skills"
   ]
 }

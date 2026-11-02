@@ -10,7 +10,7 @@ and their documented dependencies; After Effects scripts require After Effects.
 
 To refresh, compare the upstream skills and helper files at a chosen commit, update their
 copies and licenses, then update this source revision. Keep the explicit plugin skill list,
-README catalog, and routing in `quzzar-design` and `setup` aligned. Bump the plugin version
+README catalog aligned. Bump the plugin version
 for a release. The extra packs linked upstream are project-specific additions in Visual Audible,
 not part of the general Quzzar collection.
 
