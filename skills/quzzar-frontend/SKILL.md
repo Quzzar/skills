@@ -1,6 +1,6 @@
 ---
 name: quzzar-frontend
-description: Quzzar's frontend conventions covering UI architecture, tokens, state, forms, accessibility, and the component gallery, with reference research and rendered verification for visual work. Use before writing or changing any UI code, React components, styles, or client-side state.
+description: Quzzar's frontend conventions covering UI architecture, tokens, state, forms, accessibility, and the component gallery, with reference research (including Prompt Motion for animation) and rendered verification for visual work. Use before writing or changing any UI code, React components, styles, or client-side state.
 ---
 
 # quzzar-frontend
@@ -122,6 +122,26 @@ stays consistent across components and respects a single point of change.
   enter/exit on the motion tokens. Motion exit through a portal is unreliable. Motion is for
   layout and gesture polish, not overlay teardown.
 - Respect reduced-motion.
+
+### Prompt Motion references
+
+Use [Prompt Motion](https://prompt-motion.com) when designing a non-trivial animation: a hero,
+set piece, animated chart or diagram, kinetic type, loader, explainer, or showreel. The site is a
+curated gallery of motion pieces made with Claude and Codex. Each entry includes the exact prompt
+or skill behind it.
+
+- Browse by tag under `/tags/` (for example `/tags/product-ui`, `/tags/charts`). Entry pages
+  (`/<creator>-<id>`) show the video, the prompt or a skill install command with its repo, and
+  the model and effort used.
+- `/templates` holds stronger, field-based versions of popular prompts. Use `/customize` to
+  adapt one.
+- Pick one to three entries that match the brief, then read their prompts and linked
+  resources. Adapt the technique to the stack: Motion or GSAP per the rules above, motion
+  tokens, and reduced motion. Record the entry URLs you used in the design notes or PR.
+- Prompts and videos belong to their creators. Use them as references, not as shipped copy or
+  assets. Treat a linked skill like any other addition: propose it only for a concrete unmet
+  need.
+- For rendered video output rather than in-app UI, use `remotion-video`.
 
 ## Accessibility
 

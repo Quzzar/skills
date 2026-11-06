@@ -27,7 +27,7 @@ video renderer for motion work.
 | Skill | What it does |
 | --- | --- |
 | [`quzzar-workplace`](skills/quzzar-workplace/SKILL.md) | The five core guidelines, Rust-first language selection, shared-source Tauri/React applications, the canonical tool stack, the top-level `docs/` knowledge tree, and repo-wide code rules. Read before any work. |
-| [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | UI architecture and conventions, for shared browser/Tauri UI, recommended libraries, terse copy, and rendered verification. |
+| [`quzzar-frontend`](skills/quzzar-frontend/SKILL.md) | UI architecture and conventions, for shared browser/Tauri UI, recommended libraries, [Prompt Motion](https://prompt-motion.com) animation references, terse copy, and rendered verification. |
 | [`quzzar-ui-ux-design`](skills/quzzar-ui-ux-design/SKILL.md) | Every new UI: three generated directions, complete image/interaction coverage, faithful component-based implementation, and user-reviewed consolidation. |
 | [`quzzar-backend`](skills/quzzar-backend/SKILL.md) | Rust-first implementation, RLS-protected reads and writes, shared contracts, Postgres invariants, optional orchestration, secrets, and Langfuse for AI calls. |
 | [`quzzar-system-design`](skills/quzzar-system-design/SKILL.md) | Data-oriented system design with quzzar-flow: new-system discovery or honest existing-system audit, visual iteration, exhaustive planning, implementation, and independent verification. |
